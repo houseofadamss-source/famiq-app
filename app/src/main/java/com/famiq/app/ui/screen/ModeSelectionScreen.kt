@@ -48,8 +48,8 @@ fun ModeSelectionScreen(
     var showActivationDialog by remember { mutableStateOf(false) }
     var inputCode by remember { mutableStateOf("") }
 
-    // List kode rahasia lo (Bisa lo ganti sesuka hati)
-    val secretCodes = listOf("FAMIQ-PREMIUM-2024", "HOUSE-OF-ADAMS", "PREMIUM-50K")
+    // List kode rahasia baru (Ganti yang lama biar gak bocor)
+    val secretCodes = listOf("FAMIQ-EXCL-7721", "ADAMS-PRO-991", "UNIQUE-FAM-2024")
 
     if (showActivationDialog) {
         AlertDialog(
