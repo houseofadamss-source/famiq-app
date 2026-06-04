@@ -17,7 +17,7 @@ Kami memahami bahwa mencatat keuangan seringkali terasa seperti beban atau sumbe
 Fitur kolaborasi real-time dan notifikasi instan adalah fitur premium yang kami dedikasikan untuk keamanan dan stabilitas data keluarga Anda. Untuk mengaktifkan fitur ini, Anda dapat menghubungi kami:
 
 - **Email**: [houseofadamss@gmail.com](mailto:houseofadamss@gmail.com)
-- **Kontribusi Aktivasi**: Rp 50.000
+- **Kontribusi**: Hubungi kami untuk detail aktivasi
 
 ## 🚀 Cara Menjalankan Project
 
