@@ -34,9 +34,14 @@ Untuk menjalankan project ini di lingkungan pengembangan lokal:
 3. **Build & Run**:
    Buka project di Android Studio, tunggu Gradle Sync selesai, dan jalankan di perangkat atau emulator pilihan Anda.
 
-## 📜 Lisensi
+## 📜 Hak Cipta & Ketentuan Penggunaan
 
-Project ini dilisensikan di bawah [MIT License](LICENSE).
+© 2024 **House of Adams**. Seluruh hak cipta dilindungi undang-undang.
+
+Kode sumber ini dibagikan kepada publik murni untuk tujuan **pembelajaran dan portofolio**. Dengan mengakses repositori ini, Anda setuju untuk:
+- **TIDAK** menyalin, mendistribusikan ulang, atau menjual kembali kode ini dalam bentuk apa pun.
+- **TIDAK** memodifikasi kode untuk membypass atau membuka fitur premium tanpa izin tertulis dari pemilik.
+- Penggunaan komersial tanpa izin adalah pelanggaran hukum.
 
 ---
 Made with ❤️ by **House of Adams**
