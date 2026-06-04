@@ -1,0 +1,363 @@
+<resources>
+    <string name="app_name">Famiq</string>
+    <string name="back">Kembali</string>
+    <string name="description">Keterangan</string>
+    <string name="changes_saved">Perubahan Tersimpan!</string>
+    <string name="failed_check_connection">Gagal. Periksa koneksi internet.</string>
+    <string name="enter_valid_nominal">Masukkan nominal yang valid</string>
+    <string name="language">Bahasa</string>
+    <string name="select_app_language">Pilih bahasa aplikasi</string>
+    <string name="select_language">Pilih Bahasa</string>
+    <string name="multi_language_info">Lokalisasi memastikan aplikasi siap untuk siapa saja, di mana saja.</string>
+    <string name="lang_id">Bahasa Indonesia</string>
+    <string name="lang_en">Bahasa Inggris</string>
+    <string name="user">Pengguna</string>
+    <string name="email_not_available">email.tidak.tersedia@gmail.com</string>
+    <string name="default_user_name">Saya</string>
+    <string name="family_member">Anggota Keluarga</string>
+
+    <!-- MainActivity & Biometric -->
+    <string name="access_denied">Akses ditolak: %1$s</string>
+    <string name="status_fingerprint_not_recognized">Sidik jari tidak dikenali!</string>
+    <string name="biometric_title">Keamanan Premium Famiq</string>
+    <string name="biometric_subtitle">Tempel sidik jari lo untuk verifikasi akses keuangan keluarga</string>
+
+    <!-- NotificationHelper -->
+    <string name="notif_channel_name">Pengingat Famiq</string>
+    <string name="notif_channel_desc">Pengingat harian untuk mencatat pengeluaran keluarga</string>
+    <string name="notif_record_title">Waktunya Catat Keuangan! 📝</string>
+    <string name="notif_record_content">Yuk masukkan pengeluaran hari ini di Famiq agar tetap terpantau.</string>
+
+    <!-- BerandaScreen -->
+    <string name="good_morning">Selamat Pagi</string>
+    <string name="good_afternoon">Selamat Siang</string>
+    <string name="good_evening">Selamat Sore</string>
+    <string name="good_night">Selamat Malam</string>
+    <string name="offline_mode_active">Mode Offline Aktif</string>
+    <string name="balance_remaining">Sisa Saldo Kas</string>
+    <string name="income">Pemasukan</string>
+    <string name="expense">Pengeluaran</string>
+    <string name="budget_limit">Batas Belanja</string>
+    <string name="used">Terpakai</string>
+    <string name="all">Semua</string>
+    <string name="no_transactions">Belum ada transaksi</string>
+    <string name="connection_lost">Koneksi Terputus</string>
+    <string name="connection_lost_desc">Famiq tetap bisa digunakan secara offline. Catatan Anda akan otomatis disinkronkan ke Cloud saat internet kembali terhubung.</string>
+    <string name="i_understand">SAYA MENGERTI</string>
+    <string name="edit_note">Edit Catatan</string>
+    <string name="nominal">Nominal</string>
+    <string name="category">Kategori</string>
+    <string name="save_changes">Simpan Perubahan</string>
+    <string name="saving">Menyimpan…</string>
+    <string name="delete_note_q">Hapus Catatan?</string>
+    <string name="delete_note_desc">Catatan ini akan dihapus permanen dari perangkat dan cloud.</string>
+    <string name="delete">Hapus</string>
+    <string name="cancel">Batal</string>
+
+    <!-- RiwayatScreen -->
+    <string name="transaction_history">Riwayat Transaksi</string>
+    <string name="history_desc">Catat tiap pengeluaranmu hari ini, sekecil apapun itu. Biar arus kas tetap aman dan terpantau dengan baik!</string>
+    <string name="download_report">Unduh Laporan</string>
+    <string name="search_transaction_hint">Cari transaksi…</string>
+    <string name="search_transaction_label">Cari Transaksi</string>
+    <string name="showing_results">MENAMPILKAN %1$d HASIL</string>
+    <string name="today">Hari Ini</string>
+    <string name="yesterday">Kemarin</string>
+    <string name="no_history">Belum ada riwayat transaksi</string>
+    <string name="no_search_results">Pencarian tidak ditemukan</string>
+    <string name="transaction_options">Opsi Transaksi</string>
+    <string name="edit_expense">Edit Pengeluaran</string>
+    <string name="delete_transaction">Hapus Transaksi</string>
+    <string name="delete_confirm_desc">Yakin ingin menghapus transaksi ini? Data di perangkat keluarga lainnya juga akan ikut terhapus secara otomatis.</string>
+    <string name="yes_delete">Ya, Hapus</string>
+    <string name="nominal_label">Nominal</string>
+    <string name="note_label">Catatan</string>
+    <string name="category_label">Kategori</string>
+    <string name="download_report_title">Unduh Laporan</string>
+    <string name="download_report_desc">Pilih format laporan yang ingin Anda unduh untuk seluruh data transaksi ini.</string>
+    <string name="expense_trend">Tren Pengeluaran</string>
+    <string name="tap_point_detail">Ketuk titik untuk detail</string>
+    <string name="by">Oleh: %1$s</string>
+    <string name="days_7">7 Hari</string>
+    <string name="months_6">6 Bln</string>
+    <string name="close">Tutup</string>
+    <string name="time_suffix"> WIB</string>
+    <string name="mon">Sen</string>
+    <string name="tue">Sel</string>
+    <string name="wed">Rab</string>
+    <string name="thu">Kam</string>
+    <string name="fri">Jum</string>
+    <string name="sat">Sab</string>
+    <string name="sun">Min</string>
+
+    <!-- StatistikScreen -->
+    <string name="statistics">Statistik</string>
+    <string name="stat_desc">Breakdown pengeluaran per kategori</string>
+    <string name="no_stat_data">Belum ada data statistik\nTambah transaksi dulu! 📊</string>
+    <string name="expense_distribution">Distribusi Pengeluaran</string>
+    <string name="total_expense">Total Pengeluaran</string>
+
+    <!-- FormScreen -->
+    <string name="record_cash_flow">Catat Arus Kas</string>
+    <string name="expense_toggle">Pengeluaran</string>
+    <string name="income_toggle">Pemasukan</string>
+    <string name="nominal_expense">Nominal Pengeluaran</string>
+    <string name="nominal_income">Nominal Pemasukan</string>
+    <string name="note_placeholder_expense">Contoh: Makan siang, bensin…</string>
+    <string name="note_placeholder_income">Contoh: Gaji bulan ini, bonus pro…</string>
+    <string name="select_category">Pilih Kategori</string>
+    <string name="save_expense">SIMPAN PENGELUARAN</string>
+    <string name="save_income">SIMPAN PEMASUKAN</string>
+    <string name="success_saved">Berhasil Tersimpan!</string>
+    <string name="failed_try_again">Gagal. Coba lagi.</string>
+    <string name="notif_expense_title">Famiq - Pengeluaran Baru</string>
+    <string name="notif_expense_content">%1$s baru saja mencatat pengeluaran %2$s sebesar Rp %3$s.</string>
+    <string name="notif_income_title">Famiq - Pemasukan Baru</string>
+    <string name="notif_income_content">%1$s baru saja mencatat pemasukan %2$s sebesar Rp %3$s.</string>
+
+    <!-- SettingsScreen -->
+    <string name="settings">Pengaturan</string>
+    <string name="account_settings">Pengaturan Akun</string>
+    <string name="settings_desc">Atur informasi profil, mode aplikasi, dan keamanan</string>
+    <string name="my_account">Akun Saya</string>
+    <string name="user_photo">Foto Profil</string>
+    <string name="edit_name">Edit Nama</string>
+    <string name="save">Simpan</string>
+    <string name="app_mode">Mode Aplikasi</string>
+    <string name="family_mode_active">Mode Keluarga Aktif</string>
+    <string name="personal_mode">Mode Personal</string>
+    <string name="family_mode_desc">Data disinkronkan dengan anggota keluarga.</string>
+    <string name="personal_mode_desc">Data hanya tersimpan di perangkat Anda.</string>
+    <string name="upgrade_family_mode">🚀 Upgrade ke Mode Keluarga</string>
+    <string name="back_to_personal_mode">Kembali ke Mode Personal</string>
+    <string name="personalization">Personalisasi</string>
+    <string name="not_set">Belum diatur</string>
+    <string name="cycle_start_at">Mulai Tgl %1$d</string>
+    <string name="status_protected">Terlindungi</string>
+    <string name="preferences">Preferensi</string>
+    <string name="send_feedback">Kirim Feedback</string>
+    <string name="feedback_subject">Feedback Pengguna - Aplikasi Famiq</string>
+    <string name="feedback_body">Halo Developer Famiq,\n\nBerikut masukan saya:\n</string>
+    <string name="connected">Terhubung</string>
+    <string name="not_paired">Belum Pairing</string>
+    <string name="logout_desc">Yakin ingin keluar dari Famiq? Kamu bisa masuk kembali kapan saja.</string>
+    <string name="logout_confirm">Keluar?</string>
+    <string name="app_theme">Tema Aplikasi</string>
+    <string name="security">Keamanan</string>
+    <string name="fingerprint_lock">Kunci Sidik Jari</string>
+    <string name="family_mode">Mode Keluarga</string>
+    <string name="family_profile">Profil Keluarga</string>
+    <string name="budget_and_cycle">Anggaran &amp; Siklus</string>
+    <string name="monthly_target">Target Bulanan</string>
+    <string name="salary_cycle">Siklus Gajian</string>
+    <string name="notifications">Notifikasi</string>
+    <string name="reminder_notif">Notifikasi Pengingat</string>
+    <string name="data_management">Manajemen Data</string>
+    <string name="export_data">Ekspor Data</string>
+    <string name="delete_all_data">Hapus Semua Data</string>
+    <string name="about">Tentang</string>
+    <string name="version">Versi</string>
+    <string name="logout">Logout</string>
+
+    <!-- Categories -->
+    <string name="cat_food">Makan</string>
+    <string name="cat_transport">Transport</string>
+    <string name="cat_shopping">Belanja</string>
+    <string name="cat_home">Rumah</string>
+    <string name="cat_health">Kesehatan</string>
+    <string name="cat_others">Lainnya</string>
+    <string name="cat_salary">Gaji</string>
+    <string name="cat_bonus">Bonus</string>
+    <string name="cat_investment">Investasi</string>
+    <string name="cat_gift">Hadiah</string>
+    <string name="cat_other_income">Pendapatan Lain</string>
+
+    <!-- FamilyProfileScreen -->
+    <string name="family_name">Nama Keluarga</string>
+    <string name="name_updated">Nama diperbarui!</string>
+    <string name="failed_process_photo">Gagal memproses foto</string>
+    <string name="change">Ganti</string>
+    <string name="edit">Edit</string>
+    <string name="cloud_sync">Sinkronisasi Cloud</string>
+    <string name="invite_code">KODE UNDANGAN</string>
+    <string name="use_code_on_partner">Gunakan kode ini di HP Pasangan Anda</string>
+    <string name="cloud_sync_desc">Hubungkan dengan pasangan agar catatan pengeluaran otomatis sinkron di semua perangkat.</string>
+    <string name="create_family_network">BUAT JARINGAN KELUARGA</string>
+    <string name="join_network">GABUNG JARINGAN</string>
+    <string name="registered_members">Anggota Terdaftar</string>
+    <string name="no_members_yet">Belum ada anggota yang bergabung.</string>
+    <string name="enter_code">Masukkan Kode</string>
+    <string name="example_code">Contoh: X1Y2Z3</string>
+    <string name="join">GABUNG</string>
+    <string name="family_full">Keluarga sudah penuh (maksimal 6 anggota)</string>
+    <string name="family_member_limit_info">Famiq dirancang khusus untuk keharmonisan keluarga kecil. Anda dapat menambahkan hingga maksimal 6 anggota keluarga (misal: Ayah, Ibu, dan 4 anak) agar koordinasi keuangan tetap fokus dan personal.</string>
+
+    <!-- BudgetPeriodScreen -->
+    <string name="budget_period">Periode Anggaran</string>
+    <string name="budget_period_desc">Tentukan tanggal dimulainya siklus pengeluaran bulanan keluarga Anda</string>
+    <string name="cycle_date">Tanggal Siklus</string>
+    <string name="cycle_date_desc">Pilih tanggal gajian/awal bulan</string>
+    <string name="save_period">SIMPAN PERIODE</string>
+    <string name="important">Penting</string>
+    <string name="important_desc">Data pengeluaran di halaman Beranda akan dihitung ulang berdasarkan tanggal ini. Siklus akan berjalan dari tanggal terpilih hingga H-1 di bulan berikutnya.</string>
+    <string name="period_saved_success">Periode anggaran berhasil disimpan ✓</string>
+
+    <!-- MonthlyTargetScreen -->
+    <string name="target_desc">Kendalikan batas pengeluaran keluarga</string>
+    <string name="set_budget_limit">Atur Batas Anggaran</string>
+    <string name="set_budget_limit_desc">Tentukan limit pengeluaran maksimal keluarga dalam satu bulan agar kontrol finansial tetap aman.</string>
+    <string name="target_nominal">Nominal Target</string>
+    <string name="target_placeholder">Contoh: 3.000.000</string>
+    <string name="save_target">Simpan Target Pengeluaran</string>
+    <string name="target_updated_success">Target pengeluaran berhasil diperbarui!</string>
+    <string name="financial_tips_title">TIPS FINANSIAL KELUARGA (2 ANAK)</string>
+    <string name="tips_1_title">Gunakan Aturan Anggaran Berpos</string>
+    <string name="tips_1_desc">Bagi pendapatan ke pos wajib keluarga: 50% Kebutuhan Pokok &amp; Susu, 20% Edukasi/Kursus Anak, 20% Tabungan/Dana Darurat, dan 10% Hiburan Keluarga.</string>
+    <string name="tips_2_title">Belanja Bulanan Sistem Grosir (Bulk)</string>
+    <string name="tips_2_desc">Untuk kebutuhan rutin 2 anak (seperti detergen, sabun, popok, atau beras), belilah kemasan grosir besar. Ini jauh lebih hemat 15-20% dibanding beli eceran mingguan.</string>
+    <string name="tips_3_title">Prioritaskan Dana Darurat Ganda</string>
+    <string name="tips_3_desc">Dengan dua anak, risiko darurat medis atau kebutuhan sekolah mendadak meningkat dua kali lipat. Amankan minimal 6x pengeluaran bulanan di rekening terpisah.</string>
+    <string name="tips_4_title">Evaluasi Kebocoran Halus Mingguan</string>
+    <string name="tips_4_desc">Seringkali budget bocor di mainan kasual, jajan ojol, atau sewa mainan di mall saat akhir pekan. Batasi \'Budget Jajan Anak\' secara saklek per minggu.</string>
+
+    <!-- AboutScreen -->
+    <string name="about_app">Tentang Aplikasi</string>
+    <string name="version_prefix">Versi</string>
+    <string name="made_for_families">Dibuat untuk keluarga</string>
+    <string name="review_welcome_screen">Lihat Layar Sambutan</string>
+    <string name="app_description">Famiq lahir dari kebutuhan sederhana — mencatat pengeluaran keluarga tanpa ribet, tanpa spreadsheet, dan tanpa drama.\n\nKami percaya bahwa mengelola keuangan keluarga seharusnya mudah dan menyenangkan, bukan menjadi beban. Dengan Famiq, kamu dan pasangan bisa mencatat pengeluaran bersama, memantau tren, dan tetap berada di jalur yang sama.\n\nTidak ada fitur yang berlebihan. Tidak ada notifikasi yang mengganggu. Hanya yang kamu butuhkan — sesederhana itu.</string>
+    <string name="featured_features">Fitur Unggulan</string>
+    <string name="feat_sync_title">Catat Berdua</string>
+    <string name="feat_sync_desc">Kamu dan pasangan bisa catat pengeluaran dari HP masing-masing</string>
+    <string name="feat_night_title">Night Mode Otomatis</string>
+    <string name="feat_night_desc">Tema gelap menyesuaikan waktu sunrise &amp; sunset di lokasi kamu</string>
+    <string name="feat_stat_title">Statistik Visual</string>
+    <string name="feat_stat_desc">Lihat breakdown pengeluaran per kategori dengan chart yang cantik</string>
+    <string name="feat_target_title">Target Bulanan</string>
+    <string name="feat_target_desc">Set budget dan pantau apakah pengeluaran masih dalam batas</string>
+    <string name="feat_weather_title">Info Cuaca</string>
+    <string name="feat_weather_desc">Sapaan dan info cuaca real-time setiap kali buka aplikasi</string>
+    <string name="developer_label">Developer</string>
+    <string name="dev_tagline">Dibuat dengan penuh cinta,\nsedikit kafein, dan banyak debugging.</string>
+
+    <!-- LoginScreen -->
+    <string name="login_desc">Catatan pengeluaran sederhana\nuntuk keluarga Anda.</string>
+    <string name="login_canceled">Login dibatalkan</string>
+    <string name="check_internet">Periksa koneksi internet kamu</string>
+    <string name="login_failed">Login gagal, coba lagi beberapa saat</string>
+    <string name="connecting">Menghubungkan...</string>
+    <string name="sign_in_google">Masuk dengan Google</string>
+    <string name="terms_info">Dengan masuk, kamu menyetujui\nSyarat &amp; Ketentuan dan Kebijakan Privasi</string>
+
+    <!-- TimelineScreen -->
+    <string name="family_activity">Aktivitas Keluarga</string>
+    <string name="no_activity">Belum ada aktivitas tercatat.</string>
+    <string name="activity_message">%1$s telah menginput pengeluaran sebesar Rp %2$s untuk kategori %3$s.</string>
+    <string name="timeline_date_format">HH:mm \'WIB\' • dd MMM yyyy</string>
+
+    <!-- SecurityScreen -->
+    <string name="security_privacy">Keamanan &amp; Privasi</string>
+    <string name="security_screen_desc">Lindungi akses data keuangan keluarga Anda</string>
+    <string name="lock_method">METODE PENGUNCIAN</string>
+    <string name="fingerprint_desc">Gunakan sensor biometrik perangkat untuk membuka aplikasi dengan cepat.</string>
+    <string name="pin_app">PIN Aplikasi</string>
+    <string name="pin_app_desc">Gunakan 6 digit angka sebagai alternatif jika sidik jari tidak tersedia.</string>
+    <string name="data_privacy">PRIVASI DATA</string>
+    <string name="hide_balance_title">Sembunyikan Saldo</string>
+    <string name="hide_balance_desc">Sembunyikan total nominal di Beranda saat aplikasi dibuka.</string>
+    <string name="incognito_mode">Incognito Mode</string>
+    <string name="incognito_desc">Jangan simpan riwayat pencarian transaksi di perangkat ini.</string>
+
+    <!-- DataManagementScreen -->
+    <string name="data_backup">Data &amp; Cadangan</string>
+    <string name="data_backup_desc">Kelola ekspor laporan dan keamanan data Anda</string>
+    <string name="export_report">EKSPOR LAPORAN</string>
+    <string name="download_pdf">Unduh PDF</string>
+    <string name="download_pdf_desc">Cetak laporan keuangan bulanan dalam format PDF yang rapi.</string>
+    <string name="export_csv">Ekspor Excel (CSV)</string>
+    <string name="export_csv_desc">Olah data transaksi Anda lebih lanjut menggunakan Excel atau Sheets.</string>
+    <string name="data_management_title">MANAJEMEN DATA</string>
+    <string name="clear_all_data">Kosongkan Semua Data</string>
+    <string name="clear_all_data_desc">Hapus seluruh riwayat di perangkat ini</string>
+    <string name="delete_all_data_q">Hapus Semua Data?</string>
+    <string name="delete_all_data_desc">Tindakan ini akan menghapus seluruh riwayat transaksi Anda secara permanen. Data yang sudah dihapus tidak bisa dikembalikan.</string>
+    <string name="delete_permanently">Hapus Permanen</string>
+
+    <!-- ModeSelectionScreen -->
+    <string name="select_app_mode">Pilih Mode Aplikasi</string>
+    <string name="select_app_mode_desc">Sesuaikan pengalaman mencatat uang Anda</string>
+    <string name="personal_mode_title">Mode Personal</string>
+    <string name="personal_mode_description">Data transaksi hanya tersimpan di perangkat Anda. Cocok untuk penggunaan pribadi yang privat.</string>
+    <string name="family_mode_title">Mode Keluarga</string>
+    <string name="in_use">Sedang Digunakan</string>
+    <string name="premium_feature">Fitur Premium</string>
+    <string name="family_mode_premium_desc">Fitur ini memerlukan aktivasi premium. Untuk membuka Mode Keluarga dan semua keuntungannya, silakan hubungi kami di houseofadamss@gmail.com. Kontribusi: Rp 50.000.</string>
+    <string name="family_mode_benefits">Keuntungan Mode Keluarga:</string>
+    <string name="benefit_sync">Sinkronisasi Real-Time antar perangkat</string>
+    <string name="benefit_notif">Notifikasi Instan saat ada pengeluaran baru</string>
+    <string name="benefit_report">Laporan Gabungan seluruh anggota keluarga</string>
+    <string name="benefit_backup">Backup Data Aman di Cloud Firebase</string>
+    <string name="enable_family_mode">HUBUNGI DEVELOPER UNTUK MEMBUKA</string>
+    <string name="have_activation_code">Saya punya kode aktivasi</string>
+    <string name="enter_activation_code">Masukkan Kode Aktivasi</string>
+    <string name="activation_code_hint">Contoh: PREMIUM-XXXX</string>
+    <string name="activate">AKTIFKAN</string>
+    <string name="invalid_code">Kode tidak valid atau kadaluarsa</string>
+    <string name="success_activated">Premium Aktif! Selamat datang di Mode Keluarga.</string>
+    <string name="back_to_personal">KEMBALI KE PERSONAL</string>
+
+    <!-- ThemeSelectionScreen -->
+    <string name="app_theme_title">Tema Aplikasi</string>
+    <string name="app_theme_desc">Pilih tampilan aplikasi yang paling nyaman di mata Anda</string>
+    <string name="theme_auto">Otomatis</string>
+    <string name="theme_auto_desc">Tampilan akan menyesuaikan dengan pengaturan sistem atau lokasi matahari.</string>
+    <string name="theme_light">Selalu Terang</string>
+    <string name="theme_light_desc">Tampilan bersih dan cerah, cocok untuk penggunaan di siang hari.</string>
+    <string name="theme_dark">Selalu Gelap</string>
+    <string name="theme_dark_desc">Tampilan nyaman dengan kontras rendah, menghemat baterai dan ramah di mata.</string>
+    <string name="theme_change_info">Perubahan tema akan langsung diaplikasikan ke seluruh halaman aplikasi secara real-time.</string>
+
+    <!-- Cycle -->
+    <string name="gregorian">Masehi</string>
+    <string name="cycle">Siklus</string>
+
+    <!-- AccountScreen -->
+    <string name="account_details">Detail Akun</string>
+    <string name="account_details_desc">Kelola profil dan informasi akun Google yang terhubung.</string>
+    <string name="full_name">Nama Lengkap</string>
+    <string name="email_address">Alamat Email</string>
+    <string name="login_status">Status Login</string>
+    <string name="google_verified">Terverifikasi Google</string>
+    <string name="account_sync_info">Data keuangan Anda disinkronkan dengan aman ke akun Google. Anda dapat mengaksesnya dari perangkat mana pun dengan masuk menggunakan email yang sama.</string>
+
+    <!-- NotifikasiScreen -->
+    <string name="reminder_center">Pusat Pengingat</string>
+    <string name="reminder_center_desc">Atur beberapa pengingat harian agar catatan keuangan keluarga tetap rutin terisi.</string>
+    <string name="morning_session">Sesi Pagi</string>
+    <string name="morning_session_desc">Catat pengeluaran setelah sarapan atau belanja pagi.</string>
+    <string name="afternoon_session">Sesi Siang</string>
+    <string name="afternoon_session_desc">Waktu yang pas untuk mencatat makan siang atau jajan sore.</string>
+    <string name="evening_session">Sesi Malam</string>
+    <string name="evening_session_desc">Cek terakhir total pengeluaran hari ini sebelum istirahat.</string>
+    <string name="reminder_schedule_updated">Jadwal pengingat berhasil diperbarui!</string>
+    <string name="reminder_time">Waktu Pengingat</string>
+    <string name="precision_alarm_permission">Izin Alarm Presisi Dibutuhkan</string>
+    <string name="precision_alarm_desc">Android 12+ membutuhkan izin khusus agar notifikasi dikirim tepat waktu. Ini memastikan Anda tidak melewatkan sesi mencatat.</string>
+    <string name="enable_permission">AKTIFKAN IZIN</string>
+
+    <!-- WelcomeScreen -->
+    <string name="welcome_to_famiq">Selamat datang di Famiq</string>
+    <string name="famiq_desc">Cara sederhana dan menyenangkan untuk mengelola keuangan keluarga bersama pasangan.</string>
+    <string name="get_started">MULAI SEKARANG</string>
+    <string name="next">LANJUT</string>
+    <string name="skip">LEWATI</string>
+
+    <string name="onboarding_sync_title">Sinkron dengan Pasangan</string>
+    <string name="onboarding_sync_desc">Catat setiap pengeluaran bersama-sama. Data otomatis sinkron antara perangkat Anda dan pasangan.</string>
+
+    <string name="onboarding_stat_title">Statistik Visual</string>
+    <string name="onboarding_stat_desc">Pantau kebiasaan belanja Anda dengan grafik interaktif yang cantik dan mudah dipahami.</string>
+
+    <string name="onboarding_target_title">Target Bulanan</string>
+    <string name="onboarding_target_desc">Atur batas anggaran untuk berbagai kategori dan pastikan keuangan keluarga tetap terkendali.</string>
+</resources>
