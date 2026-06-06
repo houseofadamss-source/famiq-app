@@ -15,15 +15,15 @@ Kami memahami bahwa mencatat keuangan seringkali terasa seperti beban atau sumbe
 ## 📸 Cuplikan Aplikasi
 
 <p align="center">
-  <img src="screenshots/welcomescreen_1.jpeg" width="220" title="Welcome Screen">
-  <img src="screenshots/Beranda.jpeg" width="220" title="Beranda">
-  <img src="screenshots/Statistik_Pengeluaran.jpeg" width="220" title="Statistik">
+  <img src="./screenshots/welcomescreen_1.jpeg" width="220" alt="Welcome Screen">
+  <img src="./screenshots/Beranda.jpeg" width="220" alt="Beranda">
+  <img src="./screenshots/Statistik_Pengeluaran.jpeg" width="220" alt="Statistik">
 </p>
 
 <p align="center">
-  <img src="screenshots/Tambah_Pengeluaran.jpeg" width="220" title="Tambah Pengeluaran">
-  <img src="screenshots/Riwayat.jpeg" width="220" title="Riwayat">
-  <img src="screenshots/Pengaturan.jpeg" width="220" title="Pengaturan">
+  <img src="./screenshots/Tambah_Pengeluaran.jpeg" width="220" alt="Tambah Pengeluaran">
+  <img src="./screenshots/Riwayat.jpeg" width="220" alt="Riwayat">
+  <img src="./screenshots/Pengaturan.jpeg" width="220" alt="Pengaturan">
 </p>
 
 ## 💎 Mode Premium (Jaringan Keluarga)
