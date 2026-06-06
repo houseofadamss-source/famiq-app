@@ -161,7 +161,7 @@ fun StatistikScreen(
                                         Spacer(modifier = Modifier.height(24.dp))
 
                                         Box(
-                                            modifier = Modifier.size(200.dp),
+                                            modifier = Modifier.size(240.dp),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             AndroidView(
@@ -173,9 +173,12 @@ fun StatistikScreen(
                                                         holeRadius = 75f
                                                         transparentCircleRadius = 0f
                                                         setDrawEntryLabels(false)
-                                                        // ✅ Menghilangkan offset otomatis agar benar-benar di tengah
+                                                        setDrawCenterText(false)
+                                                        // ✅ Paksa reset semua jarak internal sejak inisialisasi
                                                         setExtraOffsets(0f, 0f, 0f, 0f)
                                                         minOffset = 0f
+                                                        setPadding(0,0,0,0)
+                                                        isRotationEnabled = false // Kunci rotasi biar gak geser visual
                                                     }
                                                 },
                                                 modifier = Modifier.fillMaxSize(),
@@ -186,9 +189,14 @@ fun StatistikScreen(
                                                     val dataSet = PieDataSet(entries, "").apply {
                                                         colors = sortedKategori.map { (kategoriColors[it.first] ?: Color.Gray).toArgb() }
                                                         setDrawValues(false)
-                                                        sliceSpace = 3f
+                                                        sliceSpace = 2f
                                                     }
                                                     chart.data = PieData(dataSet)
+                                                    
+                                                    // ✅ Kunci posisi lagi di block update (Wajib setelah set data)
+                                                    chart.setExtraOffsets(0f, 0f, 0f, 0f)
+                                                    chart.minOffset = 0f
+
                                                     chart.animateY(1000)
                                                     chart.invalidate()
                                                 }
