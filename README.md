@@ -12,6 +12,20 @@ Kami memahami bahwa mencatat keuangan seringkali terasa seperti beban atau sumbe
 - **Transparansi Tanpa Drama**: Dengan sinkronisasi real-time, Anda dan pasangan selalu berada di halaman yang sama. Kejujuran finansial dimulai dari sini.
 - **Sederhana & Manusiawi**: Kami membuang semua fitur rumit yang tidak Anda butuhkan. Fokus kami adalah membuat pengalaman mencatat uang menjadi sealami mungkin.
 
+## 📸 Cuplikan Aplikasi
+
+<p align="center">
+  <img src="screenshots/welcomescreen_1.jpeg" width="220" title="Welcome Screen">
+  <img src="screenshots/Beranda.jpeg" width="220" title="Beranda">
+  <img src="screenshots/Statistik_Pengeluaran.jpeg" width="220" title="Statistik">
+</p>
+
+<p align="center">
+  <img src="screenshots/Tambah_Pengeluaran.jpeg" width="220" title="Tambah Pengeluaran">
+  <img src="screenshots/Riwayat.jpeg" width="220" title="Riwayat">
+  <img src="screenshots/Pengaturan.jpeg" width="220" title="Pengaturan">
+</p>
+
 ## 💎 Mode Premium (Jaringan Keluarga)
 
 Fitur kolaborasi real-time dan notifikasi instan adalah fitur premium yang kami dedikasikan untuk keamanan dan stabilitas data keluarga Anda. Untuk mengaktifkan fitur ini, Anda dapat menghubungi kami:
