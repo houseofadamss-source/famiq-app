@@ -14,7 +14,14 @@ import kotlinx.coroutines.launch
 class NotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            rescheduleAll(context)
+            return
+        }
+
         val requestCode = intent.getIntExtra("request_code", -1)
+        if (requestCode == -1) return
+
         val channelId = "famiq_reminders"
 
         val (title, message) = when (requestCode) {
@@ -44,28 +51,27 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         // Reschedule for next day
+        rescheduleAll(context)
+    }
+
+    private fun rescheduleAll(context: Context) {
+        val pendingResult = goAsync()
         val prefs = UserPreferences(context)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                when (requestCode) {
-                    ReminderScheduler.REQ_MORNING -> {
-                        if (prefs.notifMorningAktif.first()) {
-                            ReminderScheduler.schedule(context, ReminderScheduler.REQ_MORNING, prefs.jamMorning.first())
-                        }
-                    }
-                    ReminderScheduler.REQ_AFTERNOON -> {
-                        if (prefs.notifAfternoonAktif.first()) {
-                            ReminderScheduler.schedule(context, ReminderScheduler.REQ_AFTERNOON, prefs.jamAfternoon.first())
-                        }
-                    }
-                    ReminderScheduler.REQ_EVENING -> {
-                        if (prefs.notifEveningAktif.first()) {
-                            ReminderScheduler.schedule(context, ReminderScheduler.REQ_EVENING, prefs.jamEvening.first())
-                        }
-                    }
+                if (prefs.notifMorningAktif.first()) {
+                    ReminderScheduler.schedule(context, ReminderScheduler.REQ_MORNING, prefs.jamMorning.first())
+                }
+                if (prefs.notifAfternoonAktif.first()) {
+                    ReminderScheduler.schedule(context, ReminderScheduler.REQ_AFTERNOON, prefs.jamAfternoon.first())
+                }
+                if (prefs.notifEveningAktif.first()) {
+                    ReminderScheduler.schedule(context, ReminderScheduler.REQ_EVENING, prefs.jamEvening.first())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                pendingResult.finish()
             }
         }
     }

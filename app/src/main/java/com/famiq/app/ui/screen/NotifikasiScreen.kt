@@ -65,12 +65,6 @@ fun NotifikasiScreen(
         3 -> eJam
         else -> "00:00"
     }
-    
-    val timePickerState = rememberTimePickerState(
-        initialHour = currentPickerTime.split(":").getOrNull(0)?.toIntOrNull() ?: 0,
-        initialMinute = currentPickerTime.split(":").getOrNull(1)?.toIntOrNull() ?: 0,
-        is24Hour = true
-    )
 
     LaunchedEffect(showSnackbar) {
         if (showSnackbar) {
@@ -172,6 +166,18 @@ fun NotifikasiScreen(
 
         // TIME PICKER DIALOG
         if (showPickerBySlot != null) {
+            val timePickerState = key(showPickerBySlot) {
+                val timeParts = currentPickerTime.split(":")
+                val initialHour = timeParts.getOrNull(0)?.toIntOrNull() ?: 0
+                val initialMinute = timeParts.getOrNull(1)?.toIntOrNull() ?: 0
+                
+                rememberTimePickerState(
+                    initialHour = initialHour,
+                    initialMinute = initialMinute,
+                    is24Hour = true
+                )
+            }
+
             BasicAlertDialog(
                 onDismissRequest = { showPickerBySlot = null },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
