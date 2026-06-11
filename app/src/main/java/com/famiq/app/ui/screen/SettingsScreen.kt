@@ -36,6 +36,7 @@ import com.famiq.app.R
 import com.famiq.app.data.local.UserPreferences
 import com.famiq.app.ui.components.BottomNavBar
 import com.famiq.app.ui.theme.*
+import com.famiq.app.ui.screen.Routes
 import com.famiq.app.viewmodel.TransaksiViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -54,6 +55,7 @@ fun SettingsScreen(
     val fotoKeluargaUri by viewModel.fotoKeluargaUri.collectAsStateWithLifecycle()
     val tanggalSiklusGajian by viewModel.tanggalSiklusGajian.collectAsStateWithLifecycle()
     val bahasaPreference by viewModel.bahasaPreference.collectAsStateWithLifecycle()
+    val isUpdateAvailable by viewModel.isUpdateAvailable.collectAsStateWithLifecycle()
 
     val currentUser = FirebaseAuth.getInstance().currentUser
     val googlePhotoUrl = currentUser?.photoUrl
@@ -213,7 +215,17 @@ fun SettingsScreen(
             // ── SECTION 6: LAINNYA ──
             SettingsSectionLabel(icon = Icons.Outlined.Info, label = stringResource(R.string.about))
             SettingsCard {
-                SettingsRowNavigate(label = stringResource(R.string.about), nilai = "", onClick = { navController.navigate("tentang") })
+                SettingsRowNavigate(
+                    label = stringResource(R.string.about),
+                    nilai = "",
+                    onClick = { navController.navigate("tentang") }
+                )
+                SettingsDivider()
+                SettingsRowNavigate(
+                    label = stringResource(R.string.changelog),
+                    nilai = if (isUpdateAvailable) "Update!" else "",
+                    onClick = { navController.navigate(Routes.CHANGELOG) }
+                )
                 SettingsDivider()
                 SettingsRowNavigate(
                     label = stringResource(R.string.send_feedback),

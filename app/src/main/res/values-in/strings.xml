@@ -360,4 +360,15 @@
 
     <string name="onboarding_target_title">Target Bulanan</string>
     <string name="onboarding_target_desc">Atur batas anggaran untuk berbagai kategori dan pastikan keuangan keluarga tetap terkendali.</string>
+    <!-- Update System -->
+    <string name="update_available">Pembaruan Tersedia!</string>
+    <string name="new_version_info">Versi baru Famiq telah tersedia.</string>
+    <string name="changelog">Catatan Perubahan</string>
+    <string name="update_now">UPDATE SEKARANG</string>
+    <string name="later">NANTI SAJA</string>
+    <string name="current_version">Versi Saat Ini</string>
+    <string name="latest_version_label">Versi Terbaru</string>
+    <string name="up_to_date_msg">Saat ini Anda berada di versi terbaru Famiq</string>
+    <string name="update_ready_msg">Versi terbaru Famiq sudah siap mengudara!</string>
+    <string name="version_caption_prefix">Versi %1$s</string>
 </resources>

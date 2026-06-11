@@ -79,6 +79,7 @@ fun BerandaScreen(
     var hasShownOfflineDialog by remember { mutableStateOf(false) }
     var showOfflineDialog by remember { mutableStateOf(false) }
     val statusBadgeNotif by viewModel.statusBadgeNotif.collectAsStateWithLifecycle()
+    val isUpdateAvailable by viewModel.isUpdateAvailable.collectAsStateWithLifecycle()
 
     val currentUser = FirebaseAuth.getInstance().currentUser
     val googlePhotoUrl = currentUser?.photoUrl
@@ -159,10 +160,29 @@ fun BerandaScreen(
                 Box(modifier = Modifier.fillMaxWidth().background(Brush.linearGradient(colors = listOf(GreenDark, GreenMid)), shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)).statusBarsPadding().padding(18.dp)) {
                     Column {
                         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                            Box(modifier = Modifier.size(44.dp).clip(CircleShape).background(GreenAccent.copy(alpha = 0.3f)).border(1.5.dp, GreenMain.copy(alpha = 0.6f), CircleShape), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(CircleShape)
+                                    .background(GreenAccent.copy(alpha = 0.3f))
+                                    .border(1.5.dp, GreenMain.copy(alpha = 0.6f), CircleShape)
+                                    .clickable { navController.navigate(Routes.SETTINGS) }, // Klik foto masuk ke settings
+                                contentAlignment = Alignment.Center
+                            ) {
                                 if (isFamilyMode && fotoKeluargaUri.isNotEmpty()) AsyncImage(model = Uri.parse(fotoKeluargaUri), null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                                 else if (!isFamilyMode && googlePhotoUrl != null) AsyncImage(model = googlePhotoUrl, null, modifier = Modifier.size(44.dp), contentScale = ContentScale.Crop)
                                 else Text(text = (if(isFamilyMode) namaKeluarga else namaSaya).take(1).uppercase(), color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                
+                                // ✅ RED DOT FOR UPDATE
+                                if (isUpdateAvailable) {
+                                    Box(
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .size(10.dp)
+                                            .background(Color.Red, CircleShape)
+                                            .border(1.dp, Color.White, CircleShape)
+                                    )
+                                }
                             }
                             Spacer(modifier = Modifier.width(12.dp)); Column(modifier = Modifier.weight(1f)) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {

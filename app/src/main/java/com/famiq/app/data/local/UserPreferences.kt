@@ -36,6 +36,23 @@ class UserPreferences(private val context: Context) {
         val JAM_EVENING = stringPreferencesKey("jam_evening")
 
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+
+        val LATEST_VERSION = stringPreferencesKey("latest_version")
+        val UPDATE_CHANGELOG = stringPreferencesKey("update_changelog")
+        val DOWNLOAD_URL = stringPreferencesKey("download_url")
+    }
+
+    // ── UPDATE SYSTEM ──
+    val latestVersion: Flow<String> = context.dataStore.data.map { it[LATEST_VERSION] ?: "" }
+    val updateChangelog: Flow<String> = context.dataStore.data.map { it[UPDATE_CHANGELOG] ?: "" }
+    val downloadUrl: Flow<String> = context.dataStore.data.map { it[DOWNLOAD_URL] ?: "" }
+
+    suspend fun simpanUpdateInfo(version: String, changelog: String, url: String) {
+        context.dataStore.edit {
+            it[LATEST_VERSION] = version
+            it[UPDATE_CHANGELOG] = changelog
+            it[DOWNLOAD_URL] = url
+        }
     }
 
     // ── ONBOARDING ──

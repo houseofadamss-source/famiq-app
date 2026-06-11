@@ -360,4 +360,15 @@
 
     <string name="onboarding_target_title">Monthly Target</string>
     <string name="onboarding_target_desc">Set budget limits for various categories and ensure your family finances stay on track.</string>
+    <!-- Update System -->
+    <string name="update_available">Update Available!</string>
+    <string name="new_version_info">A new version of Famiq is available.</string>
+    <string name="changelog">Changelog</string>
+    <string name="update_now">UPDATE NOW</string>
+    <string name="later">LATER</string>
+    <string name="current_version">Current Version</string>
+    <string name="latest_version_label">Latest Version</string>
+    <string name="up_to_date_msg">You are currently using the latest version of Famiq</string>
+    <string name="update_ready_msg">A newer version of Famiq is ready to fly!</string>
+    <string name="version_caption_prefix">Version %1$s</string>
 </resources>

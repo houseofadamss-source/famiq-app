@@ -7,6 +7,7 @@ import com.famiq.app.ConnectivityObserver
 import com.famiq.app.ConnectionStatus
 import com.famiq.app.FirestoreHelper
 import com.famiq.app.R
+import com.famiq.app.UpdateHelper
 import com.famiq.app.data.local.AppDatabase
 import com.famiq.app.data.local.UserPreferences
 import com.famiq.app.data.model.Anggota
@@ -154,7 +155,20 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
     fun simpanNamaSaya(nama: String) { viewModelScope.launch { prefs.simpanNamaSaya(nama) } }
     fun simpanFotoKeluargaUri(uri: String) { viewModelScope.launch { prefs.simpanFotoKeluargaUri(uri) } }
 
+    fun checkForUpdates() {
+        viewModelScope.launch {
+            try {
+                val release = UpdateHelper.api.getLatestRelease()
+                val url = release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl ?: ""
+                prefs.simpanUpdateInfo(release.tagName, release.body, url)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     init {
+        checkForUpdates()
         viewModelScope.launch {
             isFamilyMode.collect { familyActive ->
                 if (familyActive) {
@@ -183,4 +197,14 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
 
     val bahasaPreference = prefs.bahasaPreference.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "en")
     fun simpanBahasaPreference(value: String) { viewModelScope.launch { prefs.simpanBahasaPreference(value) } }
+
+    // ── UPDATE SYSTEM ──
+    val latestVersion = prefs.latestVersion.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+    val updateChangelog = prefs.updateChangelog.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+    val downloadUrl = prefs.downloadUrl.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val isUpdateAvailable = latestVersion.flatMapLatest { latest ->
+        val current = "v1.0.2"
+        kotlinx.coroutines.flow.flowOf(UpdateHelper.isNewerVersion(current, latest))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 }

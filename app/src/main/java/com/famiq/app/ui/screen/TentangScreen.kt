@@ -22,13 +22,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.famiq.app.ui.theme.*
 import com.famiq.app.R
+import com.famiq.app.viewmodel.TransaksiViewModel
 
 @Composable
-fun TentangScreen(navController: NavController) {
+fun TentangScreen(
+    navController: NavController,
+    viewModel: TransaksiViewModel = viewModel()
+) {
+    val isUpdateAvailable by viewModel.isUpdateAvailable.collectAsStateWithLifecycle()
+
     val bgColor      = MaterialTheme.colorScheme.background
     val surfaceColor = MaterialTheme.colorScheme.surface
     val onBg         = MaterialTheme.colorScheme.onBackground
@@ -109,10 +117,22 @@ fun TentangScreen(navController: NavController) {
                     color = onBg
                 )
                 Text(
-                    "${stringResource(R.string.version_prefix)} 1.0.0",
+                    "${stringResource(R.string.version_prefix)} 1.0.2",
                     fontSize = 12.sp,
                     color = onBg.copy(alpha = 0.4f)
                 )
+                
+                if (isUpdateAvailable) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = { navController.navigate(Routes.CHANGELOG) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        Text(stringResource(R.string.update_available), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(28.dp))
