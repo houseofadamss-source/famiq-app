@@ -375,12 +375,40 @@ fun TransaksiItemCard(transaksi: Transaksi, onClick: () -> Unit = {}) {
     val surfaceColor = MaterialTheme.colorScheme.surface
     val onBg = MaterialTheme.colorScheme.onBackground
 
-    Card(modifier = Modifier.fillMaxWidth().clickable { onClick() }, shape = RoundedCornerShape(13.dp), colors = CardDefaults.cardColors(containerColor = surfaceColor), elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(40.dp).background(if(transaksi.tipe == TransactionType.INCOME) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
-                Icon(imageVector = ikonVektorKategori(transaksi.kategori), contentDescription = null, modifier = Modifier.size(20.dp), tint = if(transaksi.tipe == TransactionType.INCOME) Color(0xFF2E7D32) else GreenAccent)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(13.dp),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Ikon Kategori
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        if (transaksi.tipe == TransactionType.INCOME) Color(0xFFE8F5E9) 
+                        else MaterialTheme.colorScheme.primaryContainer, 
+                        RoundedCornerShape(11.dp)
+                    ), 
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = ikonVektorKategori(transaksi.kategori), 
+                    contentDescription = null, 
+                    modifier = Modifier.size(20.dp), 
+                    tint = if (transaksi.tipe == TransactionType.INCOME) Color(0xFF2E7D32) else GreenAccent
+                )
             }
-            Spacer(modifier = Modifier.width(10.dp))
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            // Kolom Informasi (Catatan, User, Tanggal)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = transaksi.catatan.ifEmpty { stringResource(getKategoriStringRes(transaksi.kategori)) },
@@ -390,43 +418,62 @@ fun TransaksiItemCard(transaksi: Transaksi, onClick: () -> Unit = {}) {
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
+                
+                Spacer(modifier = Modifier.height(2.dp))
+                
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(5.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                    Text(
+                        text = transaksi.diinputOleh, 
+                        fontSize = 10.sp, 
+                        color = GreenAccent, 
+                        fontWeight = FontWeight.Bold, 
+                        maxLines = 1, 
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                    Text("•", fontSize = 10.sp, color = onBg.copy(alpha = 0.3f))
+                    Text(
+                        text = SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault()).format(Date(transaksi.tanggal)), 
+                        fontSize = 10.sp, 
+                        color = onBg.copy(alpha = 0.4f)
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            // Kolom Kanan (Nominal & Label)
+            Column(horizontalAlignment = Alignment.End) {
+                val prefix = if (transaksi.tipe == TransactionType.INCOME) "+Rp " else "-Rp "
+                val textColor = if (transaksi.tipe == TransactionType.INCOME) Color(0xFF2E7D32) else Color(0xFFDC2626)
+                
+                Text(
+                    text = "$prefix${formatRupiah(transaksi.nominal)}", 
+                    fontSize = 13.sp, 
+                    fontWeight = FontWeight.Bold, 
+                    color = textColor
+                )
+                
+                if (transaksi.tipe == TransactionType.EXPENSE) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(if (transaksi.isNeed) GreenSoft else Color(0xFFFEF3C7))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
-                        Text(transaksi.diinputOleh, fontSize = 10.sp, color = GreenAccent, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                        Text("•", fontSize = 10.sp, color = onBg.copy(alpha = 0.3f))
-                        Text(SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault()).format(Date(transaksi.tanggal)), fontSize = 10.sp, color = onBg.copy(alpha = 0.4f))
-                    }
-                    
-                    if (transaksi.tipe == TransactionType.EXPENSE) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(if (transaksi.isNeed) GreenSoft else Color(0xFFFEF3C7))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = if (transaksi.isNeed) stringResource(R.string.needs) else stringResource(R.string.wants),
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (transaksi.isNeed) GreenMain else Color(0xFFD97706),
-                                maxLines = 1
-                            )
-                        }
+                        Text(
+                            text = if (transaksi.isNeed) stringResource(R.string.needs) else stringResource(R.string.wants),
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Black,
+                            color = if (transaksi.isNeed) GreenMain else Color(0xFFD97706),
+                            maxLines = 1
+                        )
                     }
                 }
             }
-            val prefix = if(transaksi.tipe == TransactionType.INCOME) "+Rp " else "-Rp "
-            val textColor = if(transaksi.tipe == TransactionType.INCOME) Color(0xFF2E7D32) else Color(0xFFDC2626)
-            Text(text = "$prefix${formatRupiah(transaksi.nominal)}", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = textColor)
         }
     }
 }
