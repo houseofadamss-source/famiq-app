@@ -35,8 +35,15 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
     val isFamilyMode = prefs.isFamilyMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isPersonalPro = prefs.isPersonalPro
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun setFamilyMode(aktif: Boolean) {
         viewModelScope.launch { prefs.simpanIsFamilyMode(aktif) }
+    }
+
+    fun setPersonalPro(aktif: Boolean) {
+        viewModelScope.launch { prefs.simpanIsPersonalPro(aktif) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -103,11 +110,11 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    suspend fun tambahTransaksiRouter(nominal: Long, tipe: TransactionType, kategori: Kategori, catatan: String, diinputOleh: String): String? {
+    suspend fun tambahTransaksiRouter(nominal: Long, tipe: TransactionType, kategori: Kategori, catatan: String, diinputOleh: String, isNeed: Boolean): String? {
         return if (isFamilyMode.value) {
-            FirestoreHelper.tambahTransaksiCloud(nominal, tipe, kategori.name, catatan, diinputOleh, System.currentTimeMillis())
+            FirestoreHelper.tambahTransaksiCloud(nominal, tipe, kategori.name, catatan, diinputOleh, System.currentTimeMillis(), isNeed)
         } else {
-            dao.tambahTransaksi(Transaksi(nominal = nominal, tipe = tipe, kategori = kategori, catatan = catatan, diinputOleh = diinputOleh))
+            dao.tambahTransaksi(Transaksi(nominal = nominal, tipe = tipe, kategori = kategori, catatan = catatan, diinputOleh = diinputOleh, isNeed = isNeed))
             "local"
         }
     }
@@ -119,11 +126,11 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    suspend fun editTransaksiRouter(transaksiLama: Transaksi, nominalBaru: Long, kategoriBaru: Kategori, catatanBaru: String): Boolean {
+    suspend fun editTransaksiRouter(transaksiLama: Transaksi, nominalBaru: Long, kategoriBaru: Kategori, catatanBaru: String, isNeedBaru: Boolean): Boolean {
         return if (isFamilyMode.value) {
-            FirestoreHelper.editTransaksiCloud(transaksiLama.tanggal, transaksiLama.nominal, nominalBaru, kategoriBaru.name, catatanBaru)
+            FirestoreHelper.editTransaksiCloud(transaksiLama.tanggal, transaksiLama.nominal, nominalBaru, kategoriBaru.name, catatanBaru, isNeedBaru)
         } else {
-            dao.updateTransaksi(transaksiLama.copy(nominal = nominalBaru, kategori = kategoriBaru, catatan = catatanBaru))
+            dao.updateTransaksi(transaksiLama.copy(nominal = nominalBaru, kategori = kategoriBaru, catatan = catatanBaru, isNeed = isNeedBaru))
             true
         }
     }

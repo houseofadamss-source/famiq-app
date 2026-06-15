@@ -1,5 +1,7 @@
 package com.famiq.app.ui.screen
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,21 +41,20 @@ fun ModeSelectionScreen(
     viewModel: TransaksiViewModel = viewModel()
 ) {
     val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
+    val isPersonalPro by viewModel.isPersonalPro.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val bgColor = MaterialTheme.colorScheme.background
-    val surfaceColor = MaterialTheme.colorScheme.surface
-    val onBg = MaterialTheme.colorScheme.onBackground
 
-    var showActivationDialog by remember { mutableStateOf(false) }
+    var showActivationDialog by remember { mutableStateOf<Int?>(null) } // 1: Personal Pro, 2: Family Pro
     var inputCode by remember { mutableStateOf("") }
 
-    // List kode rahasia baru (Ganti yang lama biar gak bocor)
-    val secretCodes = listOf("FAMIQ-EXCL-7721", "ADAMS-PRO-991", "UNIQUE-FAM-2024")
+    val secretCodesPersonalPro = listOf("FAMIQ-PERSONAL-PRO", "ADAMS-LITE-77")
+    val secretCodesFamilyPro = listOf("FAMIQ-EXCL-7721", "ADAMS-PRO-991", "UNIQUE-FAM-2024")
 
-    if (showActivationDialog) {
+    if (showActivationDialog != null) {
         AlertDialog(
-            onDismissRequest = { showActivationDialog = false },
+            onDismissRequest = { showActivationDialog = null },
             title = { Text(stringResource(R.string.enter_activation_code), fontWeight = FontWeight.Bold) },
             text = {
                 OutlinedTextField(
@@ -68,9 +69,15 @@ fun ModeSelectionScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        if (secretCodes.contains(inputCode)) {
-                            viewModel.setFamilyMode(true)
-                            showActivationDialog = false
+                        val codes = if (showActivationDialog == 1) secretCodesPersonalPro else secretCodesFamilyPro
+                        if (codes.contains(inputCode)) {
+                            if (showActivationDialog == 1) {
+                                viewModel.setPersonalPro(true)
+                                viewModel.setFamilyMode(false)
+                            } else {
+                                viewModel.setFamilyMode(true)
+                            }
+                            showActivationDialog = null
                             Toast.makeText(context, context.getString(R.string.success_activated), Toast.LENGTH_LONG).show()
                         } else {
                             Toast.makeText(context, context.getString(R.string.invalid_code), Toast.LENGTH_SHORT).show()
@@ -82,7 +89,7 @@ fun ModeSelectionScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showActivationDialog = false }) {
+                TextButton(onClick = { showActivationDialog = null }) {
                     Text(stringResource(R.string.cancel), color = Color.Gray)
                 }
             },
@@ -110,32 +117,13 @@ fun ModeSelectionScreen(
                             .clickable { navController.popBackStack() }
                             .padding(vertical = 4.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowBackIosNew,
-                            contentDescription = stringResource(R.string.back),
-                            tint = Color.White.copy(alpha = 0.8f),
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(Icons.Outlined.ArrowBackIosNew, stringResource(R.string.back), tint = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = stringResource(R.string.back),
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 13.sp
-                        )
+                        Text(stringResource(R.string.back), color = Color.White.copy(alpha = 0.8f), fontSize = 13.sp)
                     }
-
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = stringResource(R.string.select_app_mode),
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Text(
-                        text = stringResource(R.string.select_app_mode_desc),
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 12.sp
-                    )
+                    Text(stringResource(R.string.select_app_mode), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(stringResource(R.string.select_app_mode_desc), color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
                 }
             }
         }
@@ -148,191 +136,154 @@ fun ModeSelectionScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // ── MODE PERSONAL ──
-            ModeCard(
+            // --- 1. PERSONAL FREE ---
+            PricingCard(
                 title = stringResource(R.string.personal_mode_title),
                 description = stringResource(R.string.personal_mode_description),
                 icon = Icons.Outlined.Person,
-                isSelected = !isFamilyMode,
-                onClick = { viewModel.setFamilyMode(false) }
+                isSelected = !isFamilyMode && !isPersonalPro,
+                price = "FREE",
+                benefits = listOf(
+                    stringResource(R.string.cat_food) + " etc tracking",
+                    "Basic Statistics"
+                ),
+                onClick = { 
+                    viewModel.setFamilyMode(false)
+                    viewModel.setPersonalPro(false)
+                }
             )
 
-            // ── MODE KELUARGA (FREEMIUM/PREMIUM STYLE) ──
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = if (isFamilyMode) 2.dp else 0.dp,
-                        color = if (isFamilyMode) GreenMain else Color.Transparent,
-                        shape = RoundedCornerShape(24.dp)
-                    ),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = surfaceColor),
-                elevation = CardDefaults.cardElevation(if (isFamilyMode) 8.dp else 2.dp)
-            ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(GreenSoft, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Outlined.Groups, contentDescription = null, tint = GreenMain)
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(stringResource(R.string.family_mode_title), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
-                            Text(
-                                if (isFamilyMode) stringResource(R.string.in_use) else stringResource(R.string.premium_feature),
-                                color = GreenMain,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        RadioButton(
-                            selected = isFamilyMode,
-                            onClick = { 
-                                if (isFamilyMode) viewModel.setFamilyMode(false)
-                            },
-                            colors = RadioButtonDefaults.colors(selectedColor = GreenMain)
-                        )
+            // --- 2. PERSONAL PRO ---
+            PricingCard(
+                title = stringResource(R.string.personal_pro_title),
+                description = stringResource(R.string.personal_pro_desc),
+                icon = Icons.Outlined.Star,
+                isSelected = !isFamilyMode && isPersonalPro,
+                price = "Rp 25.000",
+                isPremium = true,
+                benefits = listOf(
+                    stringResource(R.string.benefit_wants_needs),
+                    stringResource(R.string.benefit_exports),
+                    stringResource(R.string.benefit_recurring)
+                ),
+                onUnlockClick = {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:")
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf("houseofadamss@gmail.com"))
+                        putExtra(Intent.EXTRA_SUBJECT, "Personal Pro Activation - Famiq")
+                        putExtra(Intent.EXTRA_TEXT, "I want to activate Personal Pro.")
                     }
+                    try { context.startActivity(intent) } catch (e: Exception) { }
+                },
+                onHaveCodeClick = { showActivationDialog = 1 }
+            )
 
-                    if (!isFamilyMode) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = stringResource(R.string.family_mode_premium_desc),
-                            fontSize = 12.sp,
-                            color = Color.Gray,
-                            lineHeight = 18.sp
-                        )
+            // --- 3. FAMILY PRO ---
+            PricingCard(
+                title = stringResource(R.string.family_mode_title),
+                description = stringResource(R.string.family_mode_premium_desc),
+                icon = Icons.Outlined.Groups,
+                isSelected = isFamilyMode,
+                price = "Rp 50.000",
+                isPremium = true,
+                benefits = listOf(
+                    stringResource(R.string.benefit_sync),
+                    stringResource(R.string.benefit_notif),
+                    stringResource(R.string.family_member_limit_info).take(30) + "..."
+                ),
+                onUnlockClick = {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:")
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf("houseofadamss@gmail.com"))
+                        putExtra(Intent.EXTRA_SUBJECT, "Family Pro Activation - Famiq")
+                        putExtra(Intent.EXTRA_TEXT, "I want to activate Family Pro.")
                     }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                    HorizontalDivider(color = onBg.copy(alpha = 0.05f))
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    Text(
-                        stringResource(R.string.family_mode_benefits),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-
-                    BenefitRow(icon = Icons.Outlined.Sync, text = stringResource(R.string.benefit_sync))
-                    BenefitRow(icon = Icons.Outlined.NotificationsActive, text = stringResource(R.string.benefit_notif))
-                    BenefitRow(icon = Icons.Outlined.Analytics, text = stringResource(R.string.benefit_report))
-                    BenefitRow(icon = Icons.Outlined.CloudDone, text = stringResource(R.string.benefit_backup))
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    if (!isFamilyMode) {
-                        Button(
-                            onClick = {
-                                val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
-                                    data = android.net.Uri.parse("mailto:")
-                                    putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("houseofadamss@gmail.com"))
-                                    putExtra(android.content.Intent.EXTRA_SUBJECT, "Premium Activation Request - Famiq")
-                                    putExtra(android.content.Intent.EXTRA_TEXT, "Hello House of Adams,\n\nI am interested in activating the Premium Family Mode for Famiq. Please provide the contribution details.\n\nThank you.")
-                                }
-                                try { context.startActivity(intent) } catch (e: Exception) { }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(54.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = GreenMain)
-                        ) {
-                            Text(stringResource(R.string.enable_family_mode), fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            text = stringResource(R.string.have_activation_code),
-                            color = GreenMain,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { showActivationDialog = true },
-                            textAlign = TextAlign.Center
-                        )
-                    } else {
-                        OutlinedButton(
-                            onClick = { viewModel.setFamilyMode(false) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(54.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
-                        ) {
-                            Text(stringResource(R.string.back_to_personal), color = Color.Gray, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
+                    try { context.startActivity(intent) } catch (e: Exception) { }
+                },
+                onHaveCodeClick = { showActivationDialog = 2 }
+            )
+            
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }
 
 @Composable
-fun ModeCard(
+fun PricingCard(
     title: String,
     description: String,
     icon: ImageVector,
     isSelected: Boolean,
-    onClick: () -> Unit
+    price: String,
+    benefits: List<String>,
+    isPremium: Boolean = false,
+    onClick: (() -> Unit)? = null,
+    onUnlockClick: (() -> Unit)? = null,
+    onHaveCodeClick: (() -> Unit)? = null
 ) {
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val onBg = MaterialTheme.colorScheme.onBackground
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable(enabled = onClick != null) { onClick?.invoke() }
             .border(
                 width = if (isSelected) 2.dp else 0.dp,
                 color = if (isSelected) GreenMain else Color.Transparent,
                 shape = RoundedCornerShape(24.dp)
             ),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(if (isSelected) 4.dp else 1.dp)
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        elevation = CardDefaults.cardElevation(if (isSelected) 8.dp else 2.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(GreenSoft, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(icon, contentDescription = null, tint = GreenMain)
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(48.dp).background(GreenSoft, CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(icon, contentDescription = null, tint = GreenMain)
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(title, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(price, color = GreenMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
+                if (isSelected) {
+                    Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = GreenMain)
+                }
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
-                Text(description, fontSize = 12.sp, color = Color.Gray, lineHeight = 18.sp)
-            }
-            RadioButton(
-                selected = isSelected,
-                onClick = onClick,
-                colors = RadioButtonDefaults.colors(selectedColor = GreenMain)
-            )
-        }
-    }
-}
 
-@Composable
-fun BenefitRow(icon: ImageVector, text: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
-    ) {
-        Icon(icon, contentDescription = null, tint = GreenAccent, modifier = Modifier.size(16.dp))
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(description, fontSize = 12.sp, color = Color.Gray, lineHeight = 18.sp)
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            benefits.forEach { benefit ->
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 2.dp)) {
+                    Icon(Icons.Outlined.Done, contentDescription = null, tint = GreenAccent, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(benefit, fontSize = 11.sp, color = onBg.copy(alpha = 0.6f))
+                }
+            }
+
+            if (isPremium && !isSelected) {
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(
+                    onClick = { onUnlockClick?.invoke() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = GreenMain)
+                ) {
+                    Text(stringResource(R.string.enable_family_mode), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = stringResource(R.string.have_activation_code),
+                    color = GreenMain,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth().clickable { onHaveCodeClick?.invoke() },
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }

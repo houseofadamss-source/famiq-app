@@ -309,7 +309,7 @@ fun BerandaScreen(
                         }
                     }
                 }
-                Button(onClick = { val nom = nominalEdit.toLongOrNull(); if (nom != null && nom > 0) { coroutineScope.launch { isSaving = true; viewModel.editTransaksiRouter(transaksiEdit!!, nom, kategoriEdit, catatanEdit); isSaving = false; sheetState.hide(); transaksiEdit = null } } }, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = GreenMain), enabled = !isSaving) { Text(if (isSaving) stringResource(R.string.saving) else stringResource(R.string.save_changes), fontWeight = FontWeight.Bold) }
+                Button(onClick = { val nom = nominalEdit.toLongOrNull(); if (nom != null && nom > 0) { coroutineScope.launch { isSaving = true; viewModel.editTransaksiRouter(transaksiEdit!!, nom, kategoriEdit, catatanEdit, transaksiEdit!!.isNeed); isSaving = false; sheetState.hide(); transaksiEdit = null } } }, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = GreenMain), enabled = !isSaving) { Text(if (isSaving) stringResource(R.string.saving) else stringResource(R.string.save_changes), fontWeight = FontWeight.Bold) }
             }
         }
     }
@@ -370,7 +370,25 @@ fun TransaksiItemCard(transaksi: Transaksi, onClick: () -> Unit = {}) {
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = transaksi.catatan.ifEmpty { stringResource(getKategoriStringRes(transaksi.kategori)) }, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = onBg)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = transaksi.catatan.ifEmpty { stringResource(getKategoriStringRes(transaksi.kategori)) }, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = onBg)
+                    if (transaksi.tipe == TransactionType.EXPENSE) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(if (transaksi.isNeed) GreenSoft else Color(0xFFFEF3C7))
+                                .padding(horizontal = 4.dp, vertical = 1.dp)
+                        ) {
+                            Text(
+                                text = if (transaksi.isNeed) stringResource(R.string.needs) else stringResource(R.string.wants),
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (transaksi.isNeed) GreenMain else Color(0xFFD97706)
+                            )
+                        }
+                    }
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(transaksi.diinputOleh, fontSize = 10.sp, color = GreenAccent, fontWeight = FontWeight.Bold)
                     Text("•", fontSize = 10.sp, color = onBg.copy(alpha = 0.3f))

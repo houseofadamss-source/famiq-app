@@ -66,12 +66,18 @@ fun StatistikScreen(
     val surfaceColor = MaterialTheme.colorScheme.surface
     val onBg         = MaterialTheme.colorScheme.onBackground
 
+    val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
+    val isPersonalPro by viewModel.isPersonalPro.collectAsStateWithLifecycle()
+
     val totalPerKategori = Kategori.entries.map { kat ->
         kat to transaksiList.filter { it.kategori == kat && it.tipe == TransactionType.EXPENSE }.sumOf { it.nominal }
     }.filter { it.second > 0 }
 
     val totalSemua    = totalPerKategori.sumOf { it.second }.toFloat()
     val sortedKategori = totalPerKategori.sortedByDescending { it.second }
+
+    val totalNeeds = transaksiList.filter { it.tipe == TransactionType.EXPENSE && it.isNeed }.sumOf { it.nominal }
+    val totalWants = transaksiList.filter { it.tipe == TransactionType.EXPENSE && !it.isNeed }.sumOf { it.nominal }
 
     var startAnimation by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -220,6 +226,55 @@ fun StatistikScreen(
                                 }
                             }
 
+                            // --- FINANCIAL HABIT ANALYSIS (PRO FEATURE) ---
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = CardDefaults.cardColors(containerColor = surfaceColor),
+                                    elevation = CardDefaults.cardElevation(2.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(20.dp)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(stringResource(R.string.financial_habit_analysis), fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = onBg)
+                                            if (!isPersonalPro && !isFamilyMode) {
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Icon(Icons.Outlined.Lock, null, tint = GreenMain, modifier = Modifier.size(16.dp))
+                                            }
+                                        }
+                                        
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        
+                                        if (isPersonalPro || isFamilyMode) {
+                                            HabitRow(label = stringResource(R.string.needs_ratio), nominal = totalNeeds, total = totalSemua.toLong(), color = GreenMain)
+                                            Spacer(modifier = Modifier.height(12.dp))
+                                            HabitRow(label = stringResource(R.string.wants_ratio), nominal = totalWants, total = totalSemua.toLong(), color = Color(0xFFF59E0B))
+                                            
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            Text(
+                                                text = if (totalNeeds >= totalWants) stringResource(R.string.habit_good) else stringResource(R.string.habit_bad),
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = if (totalNeeds >= totalWants) GreenAccent else Color(0xFFDC2626)
+                                            )
+                                        } else {
+                                            Text(stringResource(R.string.personal_pro_desc), fontSize = 13.sp, color = onBg.copy(alpha = 0.5f))
+                                            Spacer(modifier = Modifier.height(12.dp))
+                                            Button(
+                                                onClick = { navController.navigate("mode_selection") },
+                                                colors = ButtonDefaults.buttonColors(containerColor = GreenMain),
+                                                shape = RoundedCornerShape(10.dp)
+                                            ) {
+                                                Text("Upgrade Now", fontSize = 12.sp)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             item { Spacer(modifier = Modifier.height(20.dp)) }
 
                             items(sortedKategori) { (kat, nominal) ->
@@ -311,5 +366,24 @@ fun StatistikScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun HabitRow(label: String, nominal: Long, total: Long, color: Color) {
+    val percent = if (total > 0) (nominal.toFloat() / total * 100).toInt() else 0
+    Column {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(label, fontSize = 13.sp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f))
+            Text("$percent%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = color)
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        LinearProgressIndicator(
+            progress = { if (total > 0) nominal.toFloat() / total else 0f },
+            modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape),
+            color = color,
+            trackColor = color.copy(alpha = 0.1f),
+            strokeCap = StrokeCap.Round
+        )
     }
 }

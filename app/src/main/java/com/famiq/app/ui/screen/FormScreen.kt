@@ -55,6 +55,7 @@ fun FormScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
+    val isPersonalPro by viewModel.isPersonalPro.collectAsStateWithLifecycle()
     val namaSaya by viewModel.namaSaya.collectAsStateWithLifecycle()
 
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -65,6 +66,7 @@ fun FormScreen(
     var nominal by remember { mutableStateOf("") }
     var catatan by remember { mutableStateOf("") }
     var kategoriAktif by remember { mutableStateOf(Kategori.MAKAN) }
+    var isNeed by remember { mutableStateOf(true) }
     var isLoading by remember { mutableStateOf(false) }
 
     // Reset kategori saat ganti tipe
@@ -96,7 +98,8 @@ fun FormScreen(
                             coroutineScope.launch {
                                 isLoading = true
                                 val penginput = if (isFamilyMode) googleName else namaSaya
-                                val result = viewModel.tambahTransaksiRouter(nom, selectedType, kategoriAktif, catatan, penginput)
+                                val finalIsNeed = if (isPersonalPro || isFamilyMode) isNeed else true
+                                val result = viewModel.tambahTransaksiRouter(nom, selectedType, kategoriAktif, catatan, penginput, finalIsNeed)
 
                                 if (result != null) {
                                     viewModel.setStatusBadgeNotif(true)
@@ -242,6 +245,59 @@ fun FormScreen(
                         colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent, cursorColor = GreenMain),
                         textStyle = TextStyle(fontSize = 14.sp, color = onBg)
                     )
+                }
+
+                // --- WANTS VS NEEDS (PRO FEATURE) ---
+                if (selectedType == TransactionType.EXPENSE) {
+                    Card(
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.wants_needs_label), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = onBg.copy(alpha = 0.5f))
+                                    if (!isPersonalPro && !isFamilyMode) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Icon(Icons.Outlined.Lock, null, tint = GreenMain, modifier = Modifier.size(14.dp))
+                                    }
+                                }
+                                
+                                Row(
+                                    modifier = Modifier
+                                        .background(onBg.copy(alpha = 0.05f), RoundedCornerShape(10.dp))
+                                        .padding(4.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isNeed) GreenMain else Color.Transparent)
+                                            .clickable(enabled = isPersonalPro || isFamilyMode) { isNeed = true }
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text(stringResource(R.string.needs), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (isNeed) Color.White else onBg.copy(alpha = 0.4f))
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (!isNeed) GreenMain else Color.Transparent)
+                                            .clickable(enabled = isPersonalPro || isFamilyMode) { isNeed = false }
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text(stringResource(R.string.wants), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (!isNeed) Color.White else onBg.copy(alpha = 0.4f))
+                                    }
+                                }
+                            }
+                            if (!isPersonalPro && !isFamilyMode) {
+                                Text(stringResource(R.string.personal_pro_desc).take(40) + "...", fontSize = 10.sp, color = GreenMain, modifier = Modifier.padding(top = 4.dp))
+                            }
+                        }
+                    }
                 }
 
                 Text(stringResource(R.string.select_category), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = onBg, modifier = Modifier.padding(start = 4.dp))

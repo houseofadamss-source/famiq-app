@@ -34,7 +34,7 @@ object ExportHelper {
             // Judul dinamis di Excel
             csvContent.append("LAPORAN PENGELUARAN ${namaKeluarga.uppercase()}\n")
             csvContent.append("Periode/Bulan: $bulan\n\n")
-            csvContent.append("Tanggal,Jam,Kategori,Catatan,Nominal,Diinput Oleh\n")
+            csvContent.append("Tanggal,Jam,Kategori,Catatan,Tipe,Nominal,Diinput Oleh\n")
 
             var total = 0L
             val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
@@ -45,8 +45,9 @@ object ExportHelper {
                 val tgl = dateFormat.format(date)
                 val jam = timeFormat.format(date)
                 val cat = trx.catatan.replace(",", " ")
+                val tipePrioritas = if (trx.isNeed) "Kebutuhan" else "Keinginan"
 
-                csvContent.append("$tgl,$jam,${trx.kategori.name},$cat,${trx.nominal},${trx.diinputOleh}\n")
+                csvContent.append("$tgl,$jam,${trx.kategori.name},$cat,$tipePrioritas,${trx.nominal},${trx.diinputOleh}\n")
                 total += trx.nominal
             }
 
@@ -141,10 +142,11 @@ object ExportHelper {
         canvas.drawLine(50f, yPos - 15f, 545f, yPos - 15f, linePaint)
 
         canvas.drawText("Tanggal", 50f, yPos, boldPaint)
-        canvas.drawText("Kategori", 130f, yPos, boldPaint)
-        canvas.drawText("Catatan", 230f, yPos, boldPaint)
-        canvas.drawText("Nominal", 380f, yPos, boldPaint)
-        canvas.drawText("Oleh", 480f, yPos, boldPaint)
+        canvas.drawText("Kategori", 120f, yPos, boldPaint)
+        canvas.drawText("Catatan", 210f, yPos, boldPaint)
+        canvas.drawText("Tipe", 340f, yPos, boldPaint)
+        canvas.drawText("Nominal", 410f, yPos, boldPaint)
+        canvas.drawText("Oleh", 500f, yPos, boldPaint)
 
         yPos += 10f
         canvas.drawLine(50f, yPos, 545f, yPos, linePaint)
@@ -158,13 +160,16 @@ object ExportHelper {
             if (yPos > 800f) return@forEach
 
             canvas.drawText(dateFormat.format(Date(trx.tanggal)), 50f, yPos, textPaint)
-            canvas.drawText(trx.kategori.name.take(10), 130f, yPos, textPaint)
+            canvas.drawText(trx.kategori.name.take(10), 120f, yPos, textPaint)
 
-            val shortNote = if(trx.catatan.length > 20) trx.catatan.take(17) + "..." else trx.catatan
-            canvas.drawText(shortNote, 230f, yPos, textPaint)
+            val shortNote = if(trx.catatan.length > 18) trx.catatan.take(15) + "..." else trx.catatan
+            canvas.drawText(shortNote, 210f, yPos, textPaint)
+            
+            val tipeStr = if (trx.isNeed) "Keb." else "Keing."
+            canvas.drawText(tipeStr, 340f, yPos, textPaint)
 
-            canvas.drawText(formatRupiah(trx.nominal), 380f, yPos, textPaint)
-            canvas.drawText(trx.diinputOleh.take(12), 480f, yPos, textPaint)
+            canvas.drawText(formatRupiah(trx.nominal), 410f, yPos, textPaint)
+            canvas.drawText(trx.diinputOleh.take(8), 500f, yPos, textPaint)
 
             total += trx.nominal
             yPos += 20f
@@ -173,8 +178,8 @@ object ExportHelper {
 
         // Total
         yPos += 15f
-        canvas.drawText("TOTAL PENGELUARAN:", 230f, yPos, boldPaint)
-        canvas.drawText(formatRupiah(total), 380f, yPos, boldPaint)
+        canvas.drawText("TOTAL PENGELUARAN:", 210f, yPos, boldPaint)
+        canvas.drawText(formatRupiah(total), 410f, yPos, boldPaint)
 
         // Footer Famiq
         yPos += 40f

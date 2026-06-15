@@ -286,9 +286,11 @@
     <!-- ModeSelectionScreen -->
     <string name="select_app_mode">Pilih Mode Aplikasi</string>
     <string name="select_app_mode_desc">Sesuaikan pengalaman mencatat uang Anda</string>
-    <string name="personal_mode_title">Mode Personal</string>
-    <string name="personal_mode_description">Data transaksi hanya tersimpan di perangkat Anda. Cocok untuk penggunaan pribadi yang privat.</string>
-    <string name="family_mode_title">Mode Keluarga</string>
+    <string name="personal_mode_title">Famiq Personal (Gratis)</string>
+    <string name="personal_mode_description">Pencatatan pribadi dasar di perangkat Anda.</string>
+    <string name="personal_pro_title">Famiq Personal (Pro)</string>
+    <string name="personal_pro_desc">Wawasan lanjutan dan alat untuk pengguna aktif. Hubungi kami untuk membuka.</string>
+    <string name="family_mode_title">Famiq Family (Pro)</string>
     <string name="in_use">Sedang Digunakan</string>
     <string name="premium_feature">Fitur Premium</string>
     <string name="family_mode_premium_desc">Fitur ini memerlukan aktivasi premium. Untuk membuka Mode Keluarga dan semua keuntungannya, silakan hubungi kami di houseofadamss@gmail.com. Kontribusi: Rp 50.000.</string>
@@ -297,6 +299,9 @@
     <string name="benefit_notif">Notifikasi Instan saat ada pengeluaran baru</string>
     <string name="benefit_report">Laporan Gabungan seluruh anggota keluarga</string>
     <string name="benefit_backup">Backup Data Aman di Cloud Firebase</string>
+    <string name="benefit_wants_needs">Tagging Keinginan vs Kebutuhan</string>
+    <string name="benefit_exports">Ekspor laporan PDF &amp; Excel tanpa batas</string>
+    <string name="benefit_recurring">Pencatatan transaksi berulang otomatis</string>
     <string name="enable_family_mode">HUBUNGI DEVELOPER UNTUK MEMBUKA</string>
     <string name="have_activation_code">Saya punya kode aktivasi</string>
     <string name="enter_activation_code">Masukkan Kode Aktivasi</string>
@@ -368,6 +373,14 @@
     <string name="later">NANTI SAJA</string>
     <string name="current_version">Versi Saat Ini</string>
     <string name="latest_version_label">Versi Terbaru</string>
+    <string name="needs">Kebutuhan</string>
+    <string name="wants">Keinginan</string>
+    <string name="wants_needs_label">Tipe Prioritas</string>
+    <string name="financial_habit_analysis">Analisis Kebiasaan Keuangan</string>
+    <string name="needs_ratio">Rasio Kebutuhan</string>
+    <string name="wants_ratio">Rasio Keinginan</string>
+    <string name="habit_good">Bagus! Anda fokus pada kebutuhan.</string>
+    <string name="habit_bad">Hati-hati! Keinginan Anda tinggi bulan ini.</string>
     <string name="up_to_date_msg">Saat ini Anda berada di versi terbaru Famiq</string>
     <string name="update_ready_msg">Versi terbaru Famiq sudah siap mengudara!</string>
     <string name="version_caption_prefix">Versi %1$s</string>

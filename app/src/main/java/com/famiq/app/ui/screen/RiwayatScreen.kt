@@ -70,6 +70,8 @@ fun RiwayatScreen(
 ) {
     val transaksiList by viewModel.semuaTransaksi.collectAsStateWithLifecycle(initialValue = emptyList())
     val namaKeluarga by viewModel.namaKeluarga.collectAsStateWithLifecycle()
+    val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
+    val isPersonalPro by viewModel.isPersonalPro.collectAsStateWithLifecycle()
 
     val bgColor = MaterialTheme.colorScheme.background
     val onBg = MaterialTheme.colorScheme.onBackground
@@ -282,7 +284,7 @@ fun RiwayatScreen(
                                     if (nom != null && nom > 0) {
                                         coroutineScope.launch {
                                             isSaving = true
-                                            viewModel.editTransaksiRouter(selectedTransaksi!!, nom, editKategori, editCatatan)
+                                            viewModel.editTransaksiRouter(selectedTransaksi!!, nom, editKategori, editCatatan, selectedTransaksi!!.isNeed)
                                             sheetState.hide()
                                         }.invokeOnCompletion {
                                             if (!sheetState.isVisible) sheetContent = SheetContent.NONE
@@ -375,12 +377,18 @@ fun RiwayatScreen(
                             }
 
                             IconButton(
-                                onClick = { showExportDialog = true },
+                                onClick = { 
+                                    if (isPersonalPro || isFamilyMode) {
+                                        showExportDialog = true 
+                                    } else {
+                                        navController.navigate("mode_selection")
+                                    }
+                                },
                                 modifier = Modifier
                                     .background(Color.White.copy(alpha = 0.2f), CircleShape)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Outlined.FileDownload,
+                                    imageVector = if (isPersonalPro || isFamilyMode) Icons.Outlined.FileDownload else Icons.Outlined.Lock,
                                     contentDescription = stringResource(R.string.download_report),
                                     tint = Color.White
                                 )

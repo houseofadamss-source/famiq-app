@@ -36,6 +36,7 @@ class UserPreferences(private val context: Context) {
         val JAM_EVENING = stringPreferencesKey("jam_evening")
 
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+        val IS_PERSONAL_PRO_KEY = booleanPreferencesKey("is_personal_pro")
 
         val LATEST_VERSION = stringPreferencesKey("latest_version")
         val UPDATE_CHANGELOG = stringPreferencesKey("update_changelog")
@@ -58,6 +59,10 @@ class UserPreferences(private val context: Context) {
     // ── ONBOARDING ──
     val onboardingCompleted: Flow<Boolean> = context.dataStore.data.map { it[ONBOARDING_COMPLETED] ?: false }
     suspend fun simpanOnboardingCompleted(completed: Boolean) { context.dataStore.edit { it[ONBOARDING_COMPLETED] = completed } }
+
+    // ── PERSONAL PRO STATUS ──
+    val isPersonalPro: Flow<Boolean> = context.dataStore.data.map { it[IS_PERSONAL_PRO_KEY] ?: false }
+    suspend fun simpanIsPersonalPro(aktif: Boolean) { context.dataStore.edit { it[IS_PERSONAL_PRO_KEY] = aktif } }
 
     // ── FITUR SEMBUNYIKAN SALDO ──
     val hideBalance: Flow<Boolean> = context.dataStore.data.map { it[HIDE_BALANCE_KEY] ?: false }

@@ -7,7 +7,7 @@ import android.content.Context
 import com.famiq.app.data.model.Anggota
 import com.famiq.app.data.model.Transaksi
 
-@Database(entities = [Transaksi::class, Anggota::class], version = 4, exportSchema = false)
+@Database(entities = [Transaksi::class, Anggota::class], version = 5, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun transaksiDao(): TransaksiDao

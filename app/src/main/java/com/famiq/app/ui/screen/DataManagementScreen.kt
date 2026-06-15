@@ -40,6 +40,8 @@ fun DataManagementScreen(
     val context = LocalContext.current
     val transaksiList by viewModel.semuaTransaksi.collectAsStateWithLifecycle(initialValue = emptyList())
     val namaKeluarga by viewModel.namaKeluarga.collectAsStateWithLifecycle()
+    val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
+    val isPersonalPro by viewModel.isPersonalPro.collectAsStateWithLifecycle()
 
     var showResetDialog by remember { mutableStateOf(false) }
 
@@ -129,9 +131,14 @@ fun DataManagementScreen(
                 title = stringResource(R.string.download_pdf),
                 description = stringResource(R.string.download_pdf_desc),
                 icon = Icons.Outlined.PictureAsPdf,
+                isLocked = !isPersonalPro && !isFamilyMode,
                 onClick = {
-                    val namaBulan = SimpleDateFormat("MMMM_yyyy", Locale.getDefault()).format(Date())
-                    ExportHelper.exportToPDF(context, transaksiList, namaBulan, namaKeluarga)
+                    if (isPersonalPro || isFamilyMode) {
+                        val namaBulan = SimpleDateFormat("MMMM_yyyy", Locale.getDefault()).format(Date())
+                        ExportHelper.exportToPDF(context, transaksiList, namaBulan, namaKeluarga)
+                    } else {
+                        navController.navigate("mode_selection")
+                    }
                 }
             )
 
@@ -139,9 +146,14 @@ fun DataManagementScreen(
                 title = stringResource(R.string.export_csv),
                 description = stringResource(R.string.export_csv_desc),
                 icon = Icons.Outlined.TableChart,
+                isLocked = !isPersonalPro && !isFamilyMode,
                 onClick = {
-                    val namaBulan = SimpleDateFormat("MMMM_yyyy", Locale.getDefault()).format(Date())
-                    ExportHelper.exportToCSV(context, transaksiList, namaBulan, namaKeluarga)
+                    if (isPersonalPro || isFamilyMode) {
+                        val namaBulan = SimpleDateFormat("MMMM_yyyy", Locale.getDefault()).format(Date())
+                        ExportHelper.exportToCSV(context, transaksiList, namaBulan, namaKeluarga)
+                    } else {
+                        navController.navigate("mode_selection")
+                    }
                 }
             )
 
@@ -179,7 +191,7 @@ fun DataManagementScreen(
 }
 
 @Composable
-fun DataOptionCard(title: String, description: String, icon: ImageVector, onClick: () -> Unit) {
+fun DataOptionCard(title: String, description: String, icon: ImageVector, isLocked: Boolean = false, onClick: () -> Unit) {
     val surfaceColor = MaterialTheme.colorScheme.surface
     val onBg = MaterialTheme.colorScheme.onBackground
 
@@ -197,7 +209,13 @@ fun DataOptionCard(title: String, description: String, icon: ImageVector, onClic
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = onBg)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = onBg)
+                    if (isLocked) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Outlined.Lock, null, tint = GreenMain, modifier = Modifier.size(14.dp))
+                    }
+                }
                 Text(description, fontSize = 11.sp, color = Color.Gray, lineHeight = 16.sp)
             }
             Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = Color.Gray)

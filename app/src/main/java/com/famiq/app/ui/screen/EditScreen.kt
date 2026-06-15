@@ -11,8 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -42,11 +44,14 @@ fun EditScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val daftarTransaksi by viewModel.semuaTransaksi.collectAsStateWithLifecycle()
+    val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
+    val isPersonalPro by viewModel.isPersonalPro.collectAsStateWithLifecycle()
     val transaksiAktif = daftarTransaksi.find { it.id == transaksiId }
 
     var nominal by remember { mutableStateOf(transaksiAktif?.nominal?.toString() ?: "") }
     var catatan by remember { mutableStateOf(transaksiAktif?.catatan ?: "") }
     var kategoriAktif by remember { mutableStateOf(transaksiAktif?.kategori ?: Kategori.MAKAN) }
+    var isNeed by remember { mutableStateOf(transaksiAktif?.isNeed ?: true) }
     var isLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(transaksiAktif) {
@@ -114,6 +119,47 @@ fun EditScreen(
                         singleLine = true
                     )
 
+                    if (transaksiAktif?.tipe == com.famiq.app.data.model.TransactionType.EXPENSE) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.wants_needs_label), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                                if (!isPersonalPro && !isFamilyMode) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Icon(Icons.Outlined.Lock, null, tint = GreenMain, modifier = Modifier.size(14.dp))
+                                }
+                            }
+                            
+                            Row(
+                                modifier = Modifier
+                                    .background(onBg.copy(alpha = 0.05f), RoundedCornerShape(10.dp))
+                                    .padding(4.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(if (isNeed) GreenMain else Color.Transparent)
+                                        .clickable(enabled = isPersonalPro || isFamilyMode) { isNeed = true }
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(stringResource(R.string.needs), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (isNeed) Color.White else onBg.copy(alpha = 0.4f))
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(if (!isNeed) GreenMain else Color.Transparent)
+                                        .clickable(enabled = isPersonalPro || isFamilyMode) { isNeed = false }
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(stringResource(R.string.wants), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (!isNeed) Color.White else onBg.copy(alpha = 0.4f))
+                                }
+                            }
+                        }
+                    }
+
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(R.string.select_category), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                         Row(
@@ -153,7 +199,8 @@ fun EditScreen(
                     if (nom != null && nom > 0 && transaksiAktif != null) {
                         coroutineScope.launch {
                             isLoading = true
-                            val sukses = viewModel.editTransaksiRouter(transaksiAktif, nom, kategoriAktif, catatan)
+                            val finalIsNeed = if (isPersonalPro || isFamilyMode) isNeed else true
+                            val sukses = viewModel.editTransaksiRouter(transaksiAktif, nom, kategoriAktif, catatan, finalIsNeed)
                             isLoading = false
                             if (sukses) {
                                 Toast.makeText(context, context.getString(R.string.changes_saved), Toast.LENGTH_SHORT).show()
