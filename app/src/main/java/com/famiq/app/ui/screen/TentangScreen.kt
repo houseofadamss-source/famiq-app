@@ -117,7 +117,7 @@ fun TentangScreen(
                     color = onBg
                 )
                 Text(
-                    "${stringResource(R.string.version_prefix)} 1.1.1",
+                    "${stringResource(R.string.version_prefix)} 1.1.2",
                     fontSize = 12.sp,
                     color = onBg.copy(alpha = 0.4f)
                 )
