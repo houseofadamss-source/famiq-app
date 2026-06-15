@@ -145,7 +145,11 @@ fun BerandaScreen(
             bottomBar = { BottomNavBar(navController) },
             containerColor = bgColor
         ) { paddingValues ->
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = paddingValues.calculateBottomPadding()) // ✅ Use padding values correctly
+            ) {
                 
                 AnimatedVisibility(visible = connectionStatus == ConnectionStatus.Unavailable, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
                     Surface(color = Color(0xFF424242), modifier = Modifier.fillMaxWidth()) {
@@ -351,7 +355,15 @@ fun SwipeToDeleteCard(transaksi: Transaksi, onDelete: () -> Unit, onEdit: () -> 
         state = dismissState,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
-            Box(modifier = Modifier.fillMaxSize().background(Color(0xFFDC2626), RoundedCornerShape(13.dp)).padding(end = 20.dp), contentAlignment = Alignment.CenterEnd) {
+            // ✅ Remove fillMaxSize() which can cause items to expand to full viewport height
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight() 
+                    .background(Color(0xFFDC2626), RoundedCornerShape(13.dp))
+                    .padding(end = 20.dp), 
+                contentAlignment = Alignment.CenterEnd
+            ) {
                 Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.delete), tint = Color.White, modifier = Modifier.size(22.dp))
             }
         }
@@ -370,29 +382,46 @@ fun TransaksiItemCard(transaksi: Transaksi, onClick: () -> Unit = {}) {
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = transaksi.catatan.ifEmpty { stringResource(getKategoriStringRes(transaksi.kategori)) }, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = onBg)
+                Text(
+                    text = transaksi.catatan.ifEmpty { stringResource(getKategoriStringRes(transaksi.kategori)) },
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = onBg,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(transaksi.diinputOleh, fontSize = 10.sp, color = GreenAccent, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        Text("•", fontSize = 10.sp, color = onBg.copy(alpha = 0.3f))
+                        Text(SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault()).format(Date(transaksi.tanggal)), fontSize = 10.sp, color = onBg.copy(alpha = 0.4f))
+                    }
+                    
                     if (transaksi.tipe == TransactionType.EXPENSE) {
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .background(if (transaksi.isNeed) GreenSoft else Color(0xFFFEF3C7))
-                                .padding(horizontal = 4.dp, vertical = 1.dp)
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 text = if (transaksi.isNeed) stringResource(R.string.needs) else stringResource(R.string.wants),
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (transaksi.isNeed) GreenMain else Color(0xFFD97706)
+                                color = if (transaksi.isNeed) GreenMain else Color(0xFFD97706),
+                                maxLines = 1
                             )
                         }
                     }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(transaksi.diinputOleh, fontSize = 10.sp, color = GreenAccent, fontWeight = FontWeight.Bold)
-                    Text("•", fontSize = 10.sp, color = onBg.copy(alpha = 0.3f))
-                    Text(SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date(transaksi.tanggal)), fontSize = 10.sp, color = onBg.copy(alpha = 0.4f))
                 }
             }
             val prefix = if(transaksi.tipe == TransactionType.INCOME) "+Rp " else "-Rp "
