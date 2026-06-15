@@ -349,6 +349,8 @@
     <string name="precision_alarm_permission">Precision Alarm Permission Needed</string>
     <string name="precision_alarm_desc">Android 12+ requires special permission to send notifications exactly on time. This ensures you don\'t miss any recording session.</string>
     <string name="enable_permission">ENABLE PERMISSION</string>
+    <string name="notification_permission_title">Notification Permission Needed</string>
+    <string name="notification_permission_desc">To receive daily reminders, please enable notification permission for Famiq.</string>
 
     <!-- WelcomeScreen -->
     <string name="welcome_to_famiq">Welcome to Famiq</string>

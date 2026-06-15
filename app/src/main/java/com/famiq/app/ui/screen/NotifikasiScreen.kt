@@ -4,7 +4,10 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.app.NotificationManager
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,6 +46,36 @@ fun NotifikasiScreen(
     viewModel: TransaksiViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    
+    // ✅ SYNC PERMISSION STATUS
+    var isNotificationEnabled by remember { mutableStateOf(true) }
+    var isExactAlarmEnabled by remember { mutableStateOf(true) }
+
+    fun checkPermissions() {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        isNotificationEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            notificationManager.areNotificationsEnabled()
+        } else true
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            isExactAlarmEnabled = alarmManager.canScheduleExactAlarms()
+        }
+    }
+
+    // Lifecycle aware permission check
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                checkPermissions()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    LaunchedEffect(Unit) { checkPermissions() }
     
     val mAktif by viewModel.notifMorningAktif.collectAsStateWithLifecycle()
     val aAktif by viewModel.notifAfternoonAktif.collectAsStateWithLifecycle()
@@ -110,10 +143,14 @@ fun NotifikasiScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 
-                // --- PERIZINAN ANDROID 12+ ---
+                // --- 1. IZIN NOTIFIKASI UMUM ---
+                if (!isNotificationEnabled) {
+                    NotificationPermissionWarningCard(context)
+                }
+
+                // --- 2. PERIZINAN ALARM PRESISI (ANDROID 12+) ---
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                    if (!alarmManager.canScheduleExactAlarms()) {
+                    if (!isExactAlarmEnabled) {
                         PermissionWarningCard(context)
                     }
                 }
@@ -315,6 +352,37 @@ fun ReminderSlotCard(
                     Text(jam, fontWeight = FontWeight.ExtraBold, color = GreenMain, fontSize = 15.sp)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun NotificationPermissionWarningCard(context: Context) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFEF2F2)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFCA5A5))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.NotificationsPaused, contentDescription = null, tint = Color(0xFFDC2626), modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(stringResource(R.string.notification_permission_title), fontWeight = FontWeight.Bold, color = Color(0xFF991B1B))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(stringResource(R.string.notification_permission_desc), fontSize = 11.sp, color = Color(0xFFB91C1C))
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = {
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp)
+            ) { Text(stringResource(R.string.enable_permission), fontSize = 12.sp) }
         }
     }
 }
