@@ -13,7 +13,7 @@ enum class DebtType {
 data class HutangPiutang(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val kontak: String, // Nama orang/instansi
+    val kontak: String,
     val nominalTotal: Long,
     val nominalTerbayar: Long = 0L,
     val tipe: DebtType,
@@ -21,5 +21,12 @@ data class HutangPiutang(
     val catatan: String = "",
     val diinputOleh: String,
     val tanggal: Long = System.currentTimeMillis(),
-    val isLunas: Boolean = false
+    val isLunas: Boolean = false,
+    
+    // ✅ NEW: Installment (Cicilan) Features
+    val isCicilan: Boolean = false,
+    val tenorTotal: Int = 1,
+    val tenorTerbayar: Int = 0,
+    val nominalPerBulan: Long = 0L,
+    val tanggalTagihan: Int = 1 // Tanggal berapa setiap bulannya (1-31)
 )

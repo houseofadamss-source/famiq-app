@@ -32,6 +32,7 @@ import com.famiq.app.data.model.DebtType
 import com.famiq.app.data.model.HutangPiutang
 import com.famiq.app.ui.theme.*
 import com.famiq.app.viewmodel.TransaksiViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,6 +43,7 @@ fun HutangPiutangScreen(
     viewModel: TransaksiViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val semuaHutang by viewModel.semuaHutang.collectAsStateWithLifecycle()
     val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
     val isPersonalPro by viewModel.isPersonalPro.collectAsStateWithLifecycle()
@@ -119,7 +121,31 @@ fun HutangPiutangScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(semuaHutang) { data ->
-                            HutangItemCard(data, onAction = { viewModel.updateHutangRouter(it) }, onDelete = { viewModel.hapusHutangRouter(it) })
+                            HutangItemCard(
+                                data = data, 
+                                onPayCicilan = { 
+                                    val updated = it.copy(
+                                        tenorTerbayar = it.tenorTerbayar + 1,
+                                        nominalTerbayar = it.nominalTerbayar + it.nominalPerBulan,
+                                        isLunas = (it.tenorTerbayar + 1) >= it.tenorTotal
+                                    )
+                                    viewModel.updateHutangRouter(updated)
+                                    
+                                    // ✅ OTOMATIS CATAT KE TRANSAKSI
+                                    coroutineScope.launch {
+                                        viewModel.tambahTransaksiRouter(
+                                            nominal = it.nominalPerBulan,
+                                            tipe = com.famiq.app.data.model.TransactionType.EXPENSE,
+                                            kategori = com.famiq.app.data.model.Kategori.LAINNYA,
+                                            catatan = "Bayar Cicilan: ${it.kontak} (${updated.tenorTerbayar}/${it.tenorTotal})",
+                                            diinputOleh = updated.diinputOleh,
+                                            isNeed = true
+                                        )
+                                    }
+                                },
+                                onMarkLunas = { viewModel.updateHutangRouter(it.copy(nominalTerbayar = it.nominalTotal, isLunas = true, tenorTerbayar = it.tenorTotal)) }, 
+                                onDelete = { viewModel.hapusHutangRouter(it) }
+                            )
                         }
                     }
                 }
@@ -128,8 +154,13 @@ fun HutangPiutangScreen(
     }
 
     if (showAddSheet) {
-        ModalBottomSheet(onDismissRequest = { showAddSheet = false }, sheetState = sheetState) {
+        ModalBottomSheet(
+            onDismissRequest = { showAddSheet = false }, 
+            sheetState = sheetState,
+            containerColor = surfaceColor
+        ) {
             AddHutangContent(
+                viewModel = viewModel,
                 onSave = { 
                     viewModel.tambahHutangRouter(it)
                     showAddSheet = false
@@ -141,7 +172,12 @@ fun HutangPiutangScreen(
 }
 
 @Composable
-fun HutangItemCard(data: HutangPiutang, onAction: (HutangPiutang) -> Unit, onDelete: (HutangPiutang) -> Unit) {
+fun HutangItemCard(
+    data: HutangPiutang, 
+    onPayCicilan: (HutangPiutang) -> Unit,
+    onMarkLunas: (HutangPiutang) -> Unit, 
+    onDelete: (HutangPiutang) -> Unit
+) {
     val onBg = MaterialTheme.colorScheme.onBackground
     val surfaceColor = MaterialTheme.colorScheme.surface
     
@@ -168,7 +204,11 @@ fun HutangItemCard(data: HutangPiutang, onAction: (HutangPiutang) -> Unit, onDel
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(data.kontak, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(if (isHutang) "Saya berhutang" else "Menghutangkan", fontSize = 11.sp, color = Color.Gray)
+                    Text(
+                        if (data.isCicilan) "Cicilan ${data.tenorTerbayar}/${data.tenorTotal} Bln" 
+                        else if (isHutang) "Saya berhutang" else "Menghutangkan", 
+                        fontSize = 11.sp, color = Color.Gray
+                    )
                 }
                 IconButton(onClick = { onDelete(data) }) {
                     Icon(Icons.Outlined.Delete, null, tint = Color.Gray.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
@@ -178,11 +218,12 @@ fun HutangItemCard(data: HutangPiutang, onAction: (HutangPiutang) -> Unit, onDel
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
-                    Text("Total", fontSize = 10.sp, color = Color.Gray)
+                    Text(if(data.isCicilan) "Total & Per Bulan" else "Total", fontSize = 10.sp, color = Color.Gray)
                     Text("Rp ${formatRupiah(data.nominalTotal)}", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                    if(data.isCicilan) Text("Rp ${formatRupiah(data.nominalPerBulan)} / Bln", fontSize = 11.sp, color = GreenMain, fontWeight = FontWeight.Bold)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Jatuh Tempo", fontSize = 10.sp, color = Color.Gray)
+                    Text(if(data.isCicilan) "Tagihan Berikutnya" else "Jatuh Tempo", fontSize = 10.sp, color = Color.Gray)
                     Text(SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(data.jatuhTempo)), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 }
             }
@@ -197,22 +238,34 @@ fun HutangItemCard(data: HutangPiutang, onAction: (HutangPiutang) -> Unit, onDel
             
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("${(progress * 100).toInt()}% terbayar", fontSize = 10.sp, color = Color.Gray)
+                Text(
+                    if(data.isCicilan) "${data.tenorTotal - data.tenorTerbayar} Bln tersisa" 
+                    else "${(progress * 100).toInt()}% terbayar", 
+                    fontSize = 10.sp, color = Color.Gray
+                )
                 Text("Sisa: Rp ${formatRupiah(data.nominalTotal - data.nominalTerbayar)}", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = if (data.isLunas) GreenMain else onBg)
             }
 
             if (!data.isLunas) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { 
-                        // Sederhananya, anggap langsung lunas atau tambah bayar
-                        onAction(data.copy(nominalTerbayar = data.nominalTotal, isLunas = true))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = if (isHutang) Color(0xFF991B1B) else GreenDark)
-                ) {
-                    Text("Tandai Lunas", fontSize = 12.sp)
+                if (data.isCicilan) {
+                    Button(
+                        onClick = { onPayCicilan(data) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenMain)
+                    ) {
+                        Text("Bayar Cicilan Bulan Ini", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                } else {
+                    Button(
+                        onClick = { onMarkLunas(data) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = if (isHutang) Color(0xFF991B1B) else GreenDark)
+                    ) {
+                        Text("Tandai Lunas", fontSize = 12.sp)
+                    }
                 }
             }
         }
@@ -220,40 +273,118 @@ fun HutangItemCard(data: HutangPiutang, onAction: (HutangPiutang) -> Unit, onDel
 }
 
 @Composable
-fun AddHutangContent(onSave: (HutangPiutang) -> Unit, onCancel: () -> Unit) {
+fun AddHutangContent(
+    viewModel: TransaksiViewModel,
+    onSave: (HutangPiutang) -> Unit, 
+    onCancel: () -> Unit
+) {
+    val context = LocalContext.current
+    val namaSaya by viewModel.namaSaya.collectAsStateWithLifecycle()
+    
     var nama by remember { mutableStateOf("") }
     var nominal by remember { mutableStateOf("") }
     var tipe by remember { mutableStateOf(DebtType.HUTANG) }
+    var isCicilan by remember { mutableStateOf(false) }
+    var tenor by remember { mutableStateOf("12") }
+    var tanggalTagihan by remember { mutableStateOf("5") }
     var catatan by remember { mutableStateOf("") }
+    var isSaving by remember { mutableStateOf(false) }
     
-    Column(modifier = Modifier.fillMaxWidth().padding(24.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(24.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text("Tambah Data Hutang/Piutang", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         
         Row(modifier = Modifier.fillMaxWidth().background(Color.Black.copy(alpha = 0.05f), RoundedCornerShape(12.dp)).padding(4.dp)) {
             Box(modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).background(if(tipe == DebtType.HUTANG) Color.White else Color.Transparent).clickable { tipe = DebtType.HUTANG }.padding(8.dp), contentAlignment = Alignment.Center) {
-                Text("Hutang Saya", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Hutang Saya", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if(tipe == DebtType.HUTANG) GreenDark else Color.Gray)
             }
             Box(modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).background(if(tipe == DebtType.PIUTANG) Color.White else Color.Transparent).clickable { tipe = DebtType.PIUTANG }.padding(8.dp), contentAlignment = Alignment.Center) {
-                Text("Piutang", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Piutang", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if(tipe == DebtType.PIUTANG) GreenDark else Color.Gray)
             }
         }
 
-        OutlinedTextField(value = nama, onValueChange = { nama = it }, label = { Text("Nama Kontak / Instansi") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = nominal, onValueChange = { if(it.all { c -> c.isDigit() }) nominal = it }, label = { Text("Nominal Total") }, modifier = Modifier.fillMaxWidth(), prefix = { Text("Rp ") })
+        OutlinedTextField(value = nama, onValueChange = { nama = it }, label = { Text("Nama Kontak / Instansi") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        
+        OutlinedTextField(
+            value = nominal, 
+            onValueChange = { if(it.all { c -> c.isDigit() }) nominal = it }, 
+            label = { Text(if(isCicilan) "Total Plafon" else "Nominal Total") }, 
+            modifier = Modifier.fillMaxWidth(), 
+            prefix = { Text("Rp ") },
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+            visualTransformation = RupiahVisualTransformation()
+        )
+
+        // --- TOGGLE CICILAN ---
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { isCicilan = !isCicilan }) {
+            Checkbox(checked = isCicilan, onCheckedChange = { isCicilan = it }, colors = CheckboxDefaults.colors(checkedColor = GreenMain))
+            Text("Ini adalah Cicilan Rutin", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        }
+
+        if (isCicilan) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = tenor, 
+                    onValueChange = { if(it.all { c -> c.isDigit() }) tenor = it }, 
+                    label = { Text("Tenor (Bulan)") }, 
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                )
+                OutlinedTextField(
+                    value = tanggalTagihan, 
+                    onValueChange = { if(it.all { c -> c.isDigit() }) tanggalTagihan = it }, 
+                    label = { Text("Tgl Tagihan") }, 
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text("1-31") },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                )
+            }
+            val nomVal = nominal.toLongOrNull() ?: 0L
+            val tenorVal = tenor.toIntOrNull() ?: 1
+            if (nomVal > 0 && tenorVal > 0) {
+                val perBulan = nomVal / tenorVal
+                Text("Estimasi: Rp ${formatRupiah(perBulan)} / bulan", fontSize = 12.sp, color = GreenMain, fontWeight = FontWeight.Bold)
+            }
+        }
+        
         OutlinedTextField(value = catatan, onValueChange = { catatan = it }, label = { Text("Catatan (Opsional)") }, modifier = Modifier.fillMaxWidth())
         
         Button(
             onClick = {
                 val nom = nominal.toLongOrNull() ?: 0L
+                val tenorVal = tenor.toIntOrNull() ?: 1
+                val tglTagihan = tanggalTagihan.toIntOrNull() ?: 1
+                
                 if (nama.isNotEmpty() && nom > 0) {
-                    onSave(HutangPiutang(kontak = nama, nominalTotal = nom, tipe = tipe, jatuhTempo = System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000), catatan = catatan, diinputOleh = "Saya"))
+                    isSaving = true
+                    val cal = Calendar.getInstance().apply {
+                        if (get(Calendar.DAY_OF_MONTH) > tglTagihan) add(Calendar.MONTH, 1)
+                        set(Calendar.DAY_OF_MONTH, tglTagihan)
+                    }
+                    
+                    val newData = HutangPiutang(
+                        kontak = nama, 
+                        nominalTotal = nom, 
+                        tipe = tipe, 
+                        jatuhTempo = cal.timeInMillis, 
+                        catatan = catatan, 
+                        diinputOleh = namaSaya,
+                        isCicilan = isCicilan,
+                        tenorTotal = tenorVal,
+                        nominalPerBulan = if(isCicilan) nom / tenorVal else 0L,
+                        tanggalTagihan = tglTagihan
+                    )
+                    onSave(newData)
+                } else {
+                    Toast.makeText(context, "Nama dan Nominal wajib diisi!", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = GreenMain)
+            colors = ButtonDefaults.buttonColors(containerColor = GreenMain),
+            enabled = !isSaving
         ) {
-            Text("Simpan Data", fontWeight = FontWeight.Bold)
+            if (isSaving) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
+            else Text("Simpan Data", fontWeight = FontWeight.Bold)
         }
     }
 }

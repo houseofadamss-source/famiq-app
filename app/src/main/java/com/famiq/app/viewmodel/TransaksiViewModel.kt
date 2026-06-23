@@ -172,6 +172,15 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
                 e.printStackTrace()
             }
         }
+        viewModelScope.launch {
+            isFamilyMode.collect { familyActive ->
+                if (familyActive) {
+                    FirestoreHelper.listenHutangKeluarga().collect { hutangCloud ->
+                        hutangCloud.forEach { data -> dao.tambahHutang(data) }
+                    }
+                }
+            }
+        }
     }
 
     init {
@@ -223,8 +232,18 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun tambahHutangRouter(data: com.famiq.app.data.model.HutangPiutang) {
         viewModelScope.launch {
-            if (isFamilyMode.value) FirestoreHelper.tambahHutangCloud(data)
-            else dao.tambahHutang(data)
+            val sukses = if (isFamilyMode.value) {
+                FirestoreHelper.tambahHutangCloud(data)
+            } else {
+                dao.tambahHutang(data)
+                true
+            }
+            
+            if (sukses) {
+                android.widget.Toast.makeText(getApplication(), "Data Hutang Berhasil Disimpan!", android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                android.widget.Toast.makeText(getApplication(), "Gagal Simpan ke Cloud. Cek Koneksi/Aturan Firebase!", android.widget.Toast.LENGTH_LONG).show()
+            }
         }
     }
 

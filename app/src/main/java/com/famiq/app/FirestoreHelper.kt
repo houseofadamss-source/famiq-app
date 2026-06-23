@@ -304,7 +304,12 @@ object FirestoreHelper {
                 "catatan" to data.catatan,
                 "diinputOleh" to data.diinputOleh,
                 "tanggal" to data.tanggal,
-                "isLunas" to data.isLunas
+                "isLunas" to data.isLunas,
+                "isCicilan" to data.isCicilan,
+                "tenorTotal" to data.tenorTotal,
+                "tenorTerbayar" to data.tenorTerbayar,
+                "nominalPerBulan" to data.nominalPerBulan,
+                "tanggalTagihan" to data.tanggalTagihan
             )
             db.collection("families").document(familyId).collection("hutang").document(data.id).set(mappedData).await()
             true
@@ -324,7 +329,9 @@ object FirestoreHelper {
                 "tipe" to data.tipe.name,
                 "jatuhTempo" to data.jatuhTempo,
                 "catatan" to data.catatan,
-                "isLunas" to data.isLunas
+                "isLunas" to data.isLunas,
+                "tenorTerbayar" to data.tenorTerbayar,
+                "nominalTerbayar" to data.nominalTerbayar
             )
             db.collection("families").document(familyId).collection("hutang").document(data.id).update(mappedData).await()
             true
@@ -344,10 +351,17 @@ object FirestoreHelper {
     fun listenHutangKeluarga(): Flow<List<com.famiq.app.data.model.HutangPiutang>> = callbackFlow {
         val uid = auth.currentUser?.uid
         if (uid == null) { trySend(emptyList()); close(); return@callbackFlow }
+        
+        var debtListener: com.google.firebase.firestore.ListenerRegistration? = null
+        
         val userListener = db.collection("users").document(uid).addSnapshotListener { userDoc, _ ->
             val familyId = userDoc?.getString("familyId")
             if (familyId.isNullOrEmpty()) { trySend(emptyList()); return@addSnapshotListener }
-            db.collection("families").document(familyId).collection("hutang")
+            
+            // Hapus listener lama jika ada (biar gak numpuk)
+            debtListener?.remove()
+            
+            debtListener = db.collection("families").document(familyId).collection("hutang")
                 .addSnapshotListener { snapshot, error ->
                     if (error != null || snapshot == null) { trySend(emptyList()); return@addSnapshotListener }
                     val listHutang = snapshot.documents.mapNotNull { doc ->
@@ -362,13 +376,21 @@ object FirestoreHelper {
                                 catatan = doc.getString("catatan") ?: "",
                                 diinputOleh = doc.getString("diinputOleh") ?: "",
                                 tanggal = doc.getLong("tanggal") ?: 0L,
-                                isLunas = doc.getBoolean("isLunas") ?: false
+                                isLunas = doc.getBoolean("isLunas") ?: false,
+                                isCicilan = doc.getBoolean("isCicilan") ?: false,
+                                tenorTotal = doc.getLong("tenorTotal")?.toInt() ?: 1,
+                                tenorTerbayar = doc.getLong("tenorTerbayar")?.toInt() ?: 0,
+                                nominalPerBulan = doc.getLong("nominalPerBulan") ?: 0L,
+                                tanggalTagihan = doc.getLong("tanggalTagihan")?.toInt() ?: 1
                             )
                         } catch (e: Exception) { null }
                     }.sortedBy { it.jatuhTempo }
                     trySend(listHutang)
                 }
         }
-        awaitClose { userListener.remove() }
+        awaitClose { 
+            userListener.remove() 
+            debtListener?.remove()
+        }
     }
 }
