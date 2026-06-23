@@ -26,5 +26,6 @@ data class Transaksi(
     val catatan: String = "",
     val diinputOleh: String,
     val tanggal: Long = System.currentTimeMillis(),
-    val isNeed: Boolean = true // ✅ Personal Pro feature
+    val isNeed: Boolean = true,
+    val isDebtPayment: Boolean = false
 )

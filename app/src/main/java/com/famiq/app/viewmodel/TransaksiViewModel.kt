@@ -110,11 +110,11 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    suspend fun tambahTransaksiRouter(nominal: Long, tipe: TransactionType, kategori: Kategori, catatan: String, diinputOleh: String, isNeed: Boolean): String? {
+    suspend fun tambahTransaksiRouter(nominal: Long, tipe: TransactionType, kategori: Kategori, catatan: String, diinputOleh: String, isNeed: Boolean, isDebtPayment: Boolean = false): String? {
         return if (isFamilyMode.value) {
-            FirestoreHelper.tambahTransaksiCloud(nominal, tipe, kategori.name, catatan, diinputOleh, System.currentTimeMillis(), isNeed)
+            FirestoreHelper.tambahTransaksiCloud(nominal, tipe, kategori.name, catatan, diinputOleh, System.currentTimeMillis(), isNeed, isDebtPayment)
         } else {
-            dao.tambahTransaksi(Transaksi(nominal = nominal, tipe = tipe, kategori = kategori, catatan = catatan, diinputOleh = diinputOleh, isNeed = isNeed))
+            dao.tambahTransaksi(Transaksi(nominal = nominal, tipe = tipe, kategori = kategori, catatan = catatan, diinputOleh = diinputOleh, isNeed = isNeed, isDebtPayment = isDebtPayment))
             "local"
         }
     }
@@ -126,11 +126,11 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    suspend fun editTransaksiRouter(transaksiLama: Transaksi, nominalBaru: Long, kategoriBaru: Kategori, catatanBaru: String, isNeedBaru: Boolean): Boolean {
+    suspend fun editTransaksiRouter(transaksiLama: Transaksi, nominalBaru: Long, kategoriBaru: Kategori, catatanBaru: String, isNeedBaru: Boolean, isDebtPaymentBaru: Boolean): Boolean {
         return if (isFamilyMode.value) {
-            FirestoreHelper.editTransaksiCloud(transaksiLama.tanggal, transaksiLama.nominal, nominalBaru, kategoriBaru.name, catatanBaru, isNeedBaru)
+            FirestoreHelper.editTransaksiCloud(transaksiLama.tanggal, transaksiLama.nominal, nominalBaru, kategoriBaru.name, catatanBaru, isNeedBaru, isDebtPaymentBaru)
         } else {
-            dao.updateTransaksi(transaksiLama.copy(nominal = nominalBaru, kategori = kategoriBaru, catatan = catatanBaru, isNeed = isNeedBaru))
+            dao.updateTransaksi(transaksiLama.copy(nominal = nominalBaru, kategori = kategoriBaru, catatan = catatanBaru, isNeed = isNeedBaru, isDebtPayment = isDebtPaymentBaru))
             true
         }
     }

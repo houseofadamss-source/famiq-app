@@ -386,4 +386,6 @@
     <string name="up_to_date_msg">You are currently using the latest version of Famiq</string>
     <string name="update_ready_msg">A newer version of Famiq is ready to fly!</string>
     <string name="version_caption_prefix">Version %1$s</string>
+    <string name="daily_expense">Daily Expense</string>
+    <string name="debt_payment">Debt Payment</string>
 </resources>

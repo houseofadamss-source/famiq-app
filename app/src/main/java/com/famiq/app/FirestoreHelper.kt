@@ -125,7 +125,7 @@ object FirestoreHelper {
         } catch (e: Exception) { false }
     }
 
-    suspend fun tambahTransaksiCloud(nominal: Long, tipe: TransactionType, kategori: String, catatan: String, diinputOleh: String, tanggal: Long, isNeed: Boolean): String? {
+    suspend fun tambahTransaksiCloud(nominal: Long, tipe: TransactionType, kategori: String, catatan: String, diinputOleh: String, tanggal: Long, isNeed: Boolean, isDebtPayment: Boolean): String? {
         val uid = auth.currentUser?.uid ?: return null
         return try {
             val userDoc = db.collection("users").document(uid).get().await()
@@ -139,7 +139,8 @@ object FirestoreHelper {
                 "catatan" to catatan,
                 "diinputOleh" to diinputOleh,
                 "tanggal" to tanggal,
-                "isNeed" to isNeed
+                "isNeed" to isNeed,
+                "isDebtPayment" to isDebtPayment
             )
             db.collection("families").document(familyId).collection("transaksi").add(transaksiData).await()
             familyId
@@ -166,7 +167,7 @@ object FirestoreHelper {
         } catch (e: Exception) { false }
     }
 
-    suspend fun editTransaksiCloud(tanggalLama: Long, nominalLama: Long, nominalBaru: Long, kategoriBaru: String, catatanBaru: String, isNeedBaru: Boolean): Boolean {
+    suspend fun editTransaksiCloud(tanggalLama: Long, nominalLama: Long, nominalBaru: Long, kategoriBaru: String, catatanBaru: String, isNeedBaru: Boolean, isDebtPaymentBaru: Boolean): Boolean {
         val uid = auth.currentUser?.uid ?: return false
         return try {
             val userDoc = db.collection("users").document(uid).get().await()
@@ -180,7 +181,13 @@ object FirestoreHelper {
                 .await()
 
             for (doc in query.documents) {
-                doc.reference.update(mapOf("nominal" to nominalBaru, "kategori" to kategoriBaru, "catatan" to catatanBaru, "isNeed" to isNeedBaru)).await()
+                doc.reference.update(mapOf(
+                    "nominal" to nominalBaru, 
+                    "kategori" to kategoriBaru, 
+                    "catatan" to catatanBaru, 
+                    "isNeed" to isNeedBaru,
+                    "isDebtPayment" to isDebtPaymentBaru
+                )).await()
             }
             true
         } catch (e: Exception) { false }
@@ -254,7 +261,8 @@ object FirestoreHelper {
                                 catatan = doc.getString("catatan") ?: "",
                                 diinputOleh = doc.getString("diinputOleh") ?: "",
                                 tanggal = doc.getLong("tanggal") ?: 0L,
-                                isNeed = doc.getBoolean("isNeed") ?: true
+                                isNeed = doc.getBoolean("isNeed") ?: true,
+                                isDebtPayment = doc.getBoolean("isDebtPayment") ?: false
                             )
                         } catch (e: Exception) { null }
                     }.sortedByDescending { it.tanggal }

@@ -386,4 +386,6 @@
     <string name="up_to_date_msg">Saat ini Anda berada di versi terbaru Famiq</string>
     <string name="update_ready_msg">Versi terbaru Famiq sudah siap mengudara!</string>
     <string name="version_caption_prefix">Versi %1$s</string>
+    <string name="daily_expense">Harian</string>
+    <string name="debt_payment">Cicilan</string>
 </resources>

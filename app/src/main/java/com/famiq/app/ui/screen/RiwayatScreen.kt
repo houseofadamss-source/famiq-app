@@ -284,7 +284,7 @@ fun RiwayatScreen(
                                     if (nom != null && nom > 0) {
                                         coroutineScope.launch {
                                             isSaving = true
-                                            viewModel.editTransaksiRouter(selectedTransaksi!!, nom, editKategori, editCatatan, selectedTransaksi!!.isNeed)
+                                            viewModel.editTransaksiRouter(selectedTransaksi!!, nom, editKategori, editCatatan, selectedTransaksi!!.isNeed, selectedTransaksi!!.isDebtPayment)
                                             sheetState.hide()
                                         }.invokeOnCompletion {
                                             if (!sheetState.isVisible) sheetContent = SheetContent.NONE

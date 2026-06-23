@@ -139,7 +139,8 @@ fun HutangPiutangScreen(
                                             kategori = com.famiq.app.data.model.Kategori.LAINNYA,
                                             catatan = "Bayar Cicilan: ${it.kontak} (${updated.tenorTerbayar}/${it.tenorTotal})",
                                             diinputOleh = updated.diinputOleh,
-                                            isNeed = true
+                                            isNeed = true,
+                                            isDebtPayment = true
                                         )
                                     }
                                 },
@@ -286,6 +287,7 @@ fun AddHutangContent(
     var tipe by remember { mutableStateOf(DebtType.HUTANG) }
     var isCicilan by remember { mutableStateOf(false) }
     var tenor by remember { mutableStateOf("12") }
+    var tenorTerbayar by remember { mutableStateOf("0") }
     var tanggalTagihan by remember { mutableStateOf("5") }
     var catatan by remember { mutableStateOf("") }
     var isSaving by remember { mutableStateOf(false) }
@@ -325,15 +327,23 @@ fun AddHutangContent(
                 OutlinedTextField(
                     value = tenor, 
                     onValueChange = { if(it.all { c -> c.isDigit() }) tenor = it }, 
-                    label = { Text("Tenor (Bulan)") }, 
+                    label = { Text("Tenor Total") }, 
                     modifier = Modifier.weight(1f),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                )
+                OutlinedTextField(
+                    value = tenorTerbayar, 
+                    onValueChange = { if(it.all { c -> c.isDigit() }) tenorTerbayar = it }, 
+                    label = { Text("Sdh Bayar") }, 
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text("Bulan") },
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = tanggalTagihan, 
                     onValueChange = { if(it.all { c -> c.isDigit() }) tanggalTagihan = it }, 
-                    label = { Text("Tgl Tagihan") }, 
-                    modifier = Modifier.weight(1f),
+                    label = { Text("Tgl") }, 
+                    modifier = Modifier.weight(0.7f),
                     placeholder = { Text("1-31") },
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
                 )
@@ -352,6 +362,7 @@ fun AddHutangContent(
             onClick = {
                 val nom = nominal.toLongOrNull() ?: 0L
                 val tenorVal = tenor.toIntOrNull() ?: 1
+                val sdhBayar = tenorTerbayar.toIntOrNull() ?: 0
                 val tglTagihan = tanggalTagihan.toIntOrNull() ?: 1
                 
                 if (nama.isNotEmpty() && nom > 0) {
@@ -361,6 +372,7 @@ fun AddHutangContent(
                         set(Calendar.DAY_OF_MONTH, tglTagihan)
                     }
                     
+                    val perBulan = if(isCicilan) nom / tenorVal else 0L
                     val newData = HutangPiutang(
                         kontak = nama, 
                         nominalTotal = nom, 
@@ -370,7 +382,9 @@ fun AddHutangContent(
                         diinputOleh = namaSaya,
                         isCicilan = isCicilan,
                         tenorTotal = tenorVal,
-                        nominalPerBulan = if(isCicilan) nom / tenorVal else 0L,
+                        tenorTerbayar = sdhBayar,
+                        nominalPerBulan = perBulan,
+                        nominalTerbayar = if(isCicilan) perBulan * sdhBayar else 0L,
                         tanggalTagihan = tglTagihan
                     )
                     onSave(newData)

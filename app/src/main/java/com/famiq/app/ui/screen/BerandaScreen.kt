@@ -134,6 +134,11 @@ fun BerandaScreen(
     }
     val totalPemasukan = remember(transaksiSiklus) { transaksiSiklus.filter { it.tipe == TransactionType.INCOME }.sumOf { it.nominal } }
     val totalPengeluaran = remember(transaksiSiklus) { transaksiSiklus.filter { it.tipe == TransactionType.EXPENSE }.sumOf { it.nominal } }
+    
+    // ✅ Calculate separated expenses
+    val totalHarian = remember(transaksiSiklus) { transaksiSiklus.filter { it.tipe == TransactionType.EXPENSE && !it.isDebtPayment }.sumOf { it.nominal } }
+    val totalCicilan = remember(transaksiSiklus) { transaksiSiklus.filter { it.tipe == TransactionType.EXPENSE && it.isDebtPayment }.sumOf { it.nominal } }
+
     val sisaSaldo = totalPemasukan - totalPengeluaran
     
     val transaksiFiltered = remember(transaksiList, filterAktif) { transaksiList.filter { filterAktif == null || it.kategori == filterAktif } }
@@ -226,14 +231,22 @@ fun BerandaScreen(
                                 }
 
                                 Spacer(modifier = Modifier.height(14.dp))
-                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    Column(modifier = Modifier.weight(1f)) {
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Column(modifier = Modifier.weight(1.1f)) {
                                         Text(stringResource(R.string.income), color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
-                                        Text(if(hideBalance) "••••" else "Rp ${formatRupiah(totalPemasukan)}", color = Color(0xFF81C784), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                        Text(if(hideBalance) "••••" else "Rp ${formatRupiah(totalPemasukan)}", color = Color(0xFF81C784), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                     }
+                                    // Vertical Divider small
+                                    Box(modifier = Modifier.width(1.dp).height(24.dp).background(Color.White.copy(alpha = 0.1f)).align(Alignment.CenterVertically))
+                                    
                                     Column(modifier = Modifier.weight(1f)) {
-                                        Text(stringResource(R.string.expense), color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
-                                        Text(if(hideBalance) "••••" else "Rp ${formatRupiah(totalPengeluaran)}", color = Color(0xFFE57373), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                        Text(stringResource(R.string.daily_expense), color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
+                                        Text(if(hideBalance) "••••" else "Rp ${formatRupiah(totalHarian)}", color = Color(0xFFE57373), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    
+                                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                                        Text(stringResource(R.string.debt_payment), color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
+                                        Text(if(hideBalance) "••••" else "Rp ${formatRupiah(totalCicilan)}", color = Color(0xFFF06292), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
@@ -345,7 +358,7 @@ fun BerandaScreen(
                         }
                     }
                 }
-                Button(onClick = { val nom = nominalEdit.toLongOrNull(); if (nom != null && nom > 0) { coroutineScope.launch { isSaving = true; viewModel.editTransaksiRouter(transaksiEdit!!, nom, kategoriEdit, catatanEdit, transaksiEdit!!.isNeed); isSaving = false; sheetState.hide(); transaksiEdit = null } } }, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = GreenMain), enabled = !isSaving) { Text(if (isSaving) stringResource(R.string.saving) else stringResource(R.string.save_changes), fontWeight = FontWeight.Bold) }
+                Button(onClick = { val nom = nominalEdit.toLongOrNull(); if (nom != null && nom > 0) { coroutineScope.launch { isSaving = true; viewModel.editTransaksiRouter(transaksiEdit!!, nom, kategoriEdit, catatanEdit, transaksiEdit!!.isNeed, transaksiEdit!!.isDebtPayment); isSaving = false; sheetState.hide(); transaksiEdit = null } } }, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = GreenMain), enabled = !isSaving) { Text(if (isSaving) stringResource(R.string.saving) else stringResource(R.string.save_changes), fontWeight = FontWeight.Bold) }
             }
         }
     }

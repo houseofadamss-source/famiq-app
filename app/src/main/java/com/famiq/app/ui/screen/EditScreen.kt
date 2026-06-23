@@ -200,7 +200,7 @@ fun EditScreen(
                         coroutineScope.launch {
                             isLoading = true
                             val finalIsNeed = if (isPersonalPro || isFamilyMode) isNeed else true
-                            val sukses = viewModel.editTransaksiRouter(transaksiAktif, nom, kategoriAktif, catatan, finalIsNeed)
+                            val sukses = viewModel.editTransaksiRouter(transaksiAktif, nom, kategoriAktif, catatan, finalIsNeed, transaksiAktif.isDebtPayment)
                             isLoading = false
                             if (sukses) {
                                 Toast.makeText(context, context.getString(R.string.changes_saved), Toast.LENGTH_SHORT).show()
