@@ -287,4 +287,88 @@ object FirestoreHelper {
         }
         awaitClose { userListener.remove() }
     }
+
+    // ── CRUD HUTANG PIUTANG CLOUD ──
+    suspend fun tambahHutangCloud(data: com.famiq.app.data.model.HutangPiutang): Boolean {
+        val uid = auth.currentUser?.uid ?: return false
+        return try {
+            val userDoc = db.collection("users").document(uid).get().await()
+            val familyId = userDoc.getString("familyId") ?: return false
+            
+            val mappedData = hashMapOf(
+                "kontak" to data.kontak,
+                "nominalTotal" to data.nominalTotal,
+                "nominalTerbayar" to data.nominalTerbayar,
+                "tipe" to data.tipe.name,
+                "jatuhTempo" to data.jatuhTempo,
+                "catatan" to data.catatan,
+                "diinputOleh" to data.diinputOleh,
+                "tanggal" to data.tanggal,
+                "isLunas" to data.isLunas
+            )
+            db.collection("families").document(familyId).collection("hutang").document(data.id).set(mappedData).await()
+            true
+        } catch (e: Exception) { false }
+    }
+
+    suspend fun updateHutangCloud(data: com.famiq.app.data.model.HutangPiutang): Boolean {
+        val uid = auth.currentUser?.uid ?: return false
+        return try {
+            val userDoc = db.collection("users").document(uid).get().await()
+            val familyId = userDoc.getString("familyId") ?: return false
+            
+            val mappedData = mapOf(
+                "kontak" to data.kontak,
+                "nominalTotal" to data.nominalTotal,
+                "nominalTerbayar" to data.nominalTerbayar,
+                "tipe" to data.tipe.name,
+                "jatuhTempo" to data.jatuhTempo,
+                "catatan" to data.catatan,
+                "isLunas" to data.isLunas
+            )
+            db.collection("families").document(familyId).collection("hutang").document(data.id).update(mappedData).await()
+            true
+        } catch (e: Exception) { false }
+    }
+
+    suspend fun hapusHutangCloud(id: String): Boolean {
+        val uid = auth.currentUser?.uid ?: return false
+        return try {
+            val userDoc = db.collection("users").document(uid).get().await()
+            val familyId = userDoc.getString("familyId") ?: return false
+            db.collection("families").document(familyId).collection("hutang").document(id).delete().await()
+            true
+        } catch (e: Exception) { false }
+    }
+
+    fun listenHutangKeluarga(): Flow<List<com.famiq.app.data.model.HutangPiutang>> = callbackFlow {
+        val uid = auth.currentUser?.uid
+        if (uid == null) { trySend(emptyList()); close(); return@callbackFlow }
+        val userListener = db.collection("users").document(uid).addSnapshotListener { userDoc, _ ->
+            val familyId = userDoc?.getString("familyId")
+            if (familyId.isNullOrEmpty()) { trySend(emptyList()); return@addSnapshotListener }
+            db.collection("families").document(familyId).collection("hutang")
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null || snapshot == null) { trySend(emptyList()); return@addSnapshotListener }
+                    val listHutang = snapshot.documents.mapNotNull { doc ->
+                        try {
+                            com.famiq.app.data.model.HutangPiutang(
+                                id = doc.id,
+                                kontak = doc.getString("kontak") ?: "",
+                                nominalTotal = doc.getLong("nominalTotal") ?: 0L,
+                                nominalTerbayar = doc.getLong("nominalTerbayar") ?: 0L,
+                                tipe = com.famiq.app.data.model.DebtType.valueOf(doc.getString("tipe") ?: "HUTANG"),
+                                jatuhTempo = doc.getLong("jatuhTempo") ?: 0L,
+                                catatan = doc.getString("catatan") ?: "",
+                                diinputOleh = doc.getString("diinputOleh") ?: "",
+                                tanggal = doc.getLong("tanggal") ?: 0L,
+                                isLunas = doc.getBoolean("isLunas") ?: false
+                            )
+                        } catch (e: Exception) { null }
+                    }.sortedBy { it.jatuhTempo }
+                    trySend(listHutang)
+                }
+        }
+        awaitClose { userListener.remove() }
+    }
 }

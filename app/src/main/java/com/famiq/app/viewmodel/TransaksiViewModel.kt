@@ -214,4 +214,31 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
         val current = "v1.1.2" // ✅ Sync dengan versi rilis GitHub
         kotlinx.coroutines.flow.flowOf(UpdateHelper.isNewerVersion(current, latest))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // ── HUTANG PIUTANG SYSTEM ──
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val semuaHutang = isFamilyMode.flatMapLatest { isFamily ->
+        if (isFamily) FirestoreHelper.listenHutangKeluarga() else dao.semuaHutang()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun tambahHutangRouter(data: com.famiq.app.data.model.HutangPiutang) {
+        viewModelScope.launch {
+            if (isFamilyMode.value) FirestoreHelper.tambahHutangCloud(data)
+            else dao.tambahHutang(data)
+        }
+    }
+
+    fun updateHutangRouter(data: com.famiq.app.data.model.HutangPiutang) {
+        viewModelScope.launch {
+            if (isFamilyMode.value) FirestoreHelper.updateHutangCloud(data)
+            else dao.updateHutang(data)
+        }
+    }
+
+    fun hapusHutangRouter(data: com.famiq.app.data.model.HutangPiutang) {
+        viewModelScope.launch {
+            if (isFamilyMode.value) FirestoreHelper.hapusHutangCloud(data.id)
+            else dao.hapusHutang(data)
+        }
+    }
 }

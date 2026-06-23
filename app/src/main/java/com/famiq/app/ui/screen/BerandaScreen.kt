@@ -250,6 +250,38 @@ fun BerandaScreen(
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // --- DEBT TRACKER MINI CARD ---
+                        val semuaHutang by viewModel.semuaHutang.collectAsStateWithLifecycle()
+                        val hutangBelumLunas = semuaHutang.filter { !it.isLunas }
+                        
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { navController.navigate(Routes.HUTANG_PIUTANG) },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.08f))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Outlined.Payments, null, tint = Color(0xFFFCD34D), modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("Manajemen Hutang", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        if(hutangBelumLunas.isEmpty()) "Semua tagihan lunas ✨" 
+                                        else "${hutangBelumLunas.size} tagihan perlu dipantau", 
+                                        color = Color.White.copy(alpha = 0.6f), 
+                                        fontSize = 11.sp
+                                    )
+                                }
+                                Icon(Icons.Outlined.ChevronRight, null, tint = Color.White.copy(alpha = 0.3f), modifier = Modifier.size(16.dp))
+                            }
+                        }
                     }
                 }
 

@@ -36,6 +36,7 @@ object Routes {
     const val DATA_MANAGEMENT = "data_management"
     const val WELCOME         = "welcome"
     const val CHANGELOG       = "changelog"
+    const val HUTANG_PIUTANG  = "hutang_piutang"
 }
 
 @Composable
@@ -97,6 +98,7 @@ fun NavGraph(
         composable(Routes.SECURITY) { SecurityScreen(navController = navController) }
         composable(Routes.DATA_MANAGEMENT) { DataManagementScreen(navController = navController) }
         composable(Routes.CHANGELOG) { ChangelogScreen(navController = navController) }
+        composable(Routes.HUTANG_PIUTANG) { HutangPiutangScreen(navController = navController) }
 
         composable(Routes.TIMELINE) {
             val viewModel: TransaksiViewModel = viewModel()

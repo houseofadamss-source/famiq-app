@@ -41,4 +41,20 @@ interface TransaksiDao {
 
     @Query("SELECT * FROM anggota ORDER BY nama ASC")
     fun semuaAnggota(): Flow<List<Anggota>>
+
+    // ── CRUD HUTANG PIUTANG (NEW FEATURE) ────────────────────────────────────
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun tambahHutang(data: com.famiq.app.data.model.HutangPiutang)
+
+    @Update
+    suspend fun updateHutang(data: com.famiq.app.data.model.HutangPiutang)
+
+    @Delete
+    suspend fun hapusHutang(data: com.famiq.app.data.model.HutangPiutang)
+
+    @Query("SELECT * FROM hutang_piutang ORDER BY jatuhTempo ASC")
+    fun semuaHutang(): Flow<List<com.famiq.app.data.model.HutangPiutang>>
+
+    @Query("DELETE FROM hutang_piutang")
+    suspend fun hapusSemuaHutang()
 }

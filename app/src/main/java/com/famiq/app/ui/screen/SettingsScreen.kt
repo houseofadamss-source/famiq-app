@@ -169,12 +169,13 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ── SECTION 2: KEUANGAN ──
             SettingsSectionLabel(icon = Icons.Outlined.AccountBalanceWallet, label = stringResource(R.string.budget_and_cycle))
             SettingsCard {
                 SettingsRowNavigate(label = stringResource(R.string.monthly_target), nilai = if (targetBulanan > 0) formatRupiah(targetBulanan) else stringResource(R.string.not_set), onClick = { navController.navigate("target_bulanan") })
                 SettingsDivider()
                 SettingsRowNavigate(label = stringResource(R.string.salary_cycle), nilai = stringResource(R.string.cycle_start_at, tanggalSiklusGajian), onClick = { navController.navigate("siklus_gajian") })
+                SettingsDivider()
+                SettingsRowNavigate(label = "Manajemen Hutang", nilai = "", onClick = { navController.navigate(Routes.HUTANG_PIUTANG) })
             }
 
             Spacer(modifier = Modifier.height(16.dp))
