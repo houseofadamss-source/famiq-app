@@ -220,7 +220,7 @@ class TransaksiViewModel(application: Application) : AndroidViewModel(applicatio
     val downloadUrl = prefs.downloadUrl.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
     val isUpdateAvailable = latestVersion.flatMapLatest { latest ->
-        val current = "v1.1.2" // ✅ Sync dengan versi rilis GitHub
+        val current = "v1.2.0" // ✅ Sesuai request lo, kita set ke 1.2.0
         kotlinx.coroutines.flow.flowOf(UpdateHelper.isNewerVersion(current, latest))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 

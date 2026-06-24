@@ -239,9 +239,13 @@ fun BerandaScreen(
                                     // Vertical Divider small
                                     Box(modifier = Modifier.width(1.dp).height(24.dp).background(Color.White.copy(alpha = 0.1f)).align(Alignment.CenterVertically))
                                     
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(stringResource(R.string.daily_expense), color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
-                                        Text(if(hideBalance) "••••" else "Rp ${formatRupiah(totalHarian)}", color = Color(0xFFE57373), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                    Column(modifier = Modifier.weight(1.2f)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(stringResource(R.string.daily_expense), color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp)
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("(${stringResource(R.string.up_to_today)})", color = Color.White.copy(alpha = 0.4f), fontSize = 8.sp)
+                                        }
+                                        Text(if(hideBalance) "••••" else "Rp ${formatRupiah(totalHarian)}", color = Color(0xFFFCA5A5), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                     }
                                     
                                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
@@ -261,38 +265,34 @@ fun BerandaScreen(
                                     Spacer(modifier = Modifier.height(6.dp))
                                     LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)), color = if (progress >= 0.85f) Color(0xFFEF4444) else Color(0xFF34D399), trackColor = Color.White.copy(alpha = 0.15f))
                                 }
-                            }
-                        }
 
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // --- DEBT TRACKER MINI CARD ---
-                        val semuaHutang by viewModel.semuaHutang.collectAsStateWithLifecycle()
-                        val hutangBelumLunas = semuaHutang.filter { !it.isLunas }
-                        
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { navController.navigate(Routes.HUTANG_PIUTANG) },
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.08f))
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(Icons.Outlined.Payments, null, tint = Color(0xFFFCD34D), modifier = Modifier.size(20.dp))
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Manajemen Hutang", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                                    Text(
-                                        if(hutangBelumLunas.isEmpty()) "Semua tagihan lunas ✨" 
-                                        else "${hutangBelumLunas.size} tagihan perlu dipantau", 
-                                        color = Color.White.copy(alpha = 0.6f), 
-                                        fontSize = 11.sp
-                                    )
+                                // ✅ INTEGRATED DEBT STATUS
+                                val semuaHutang by viewModel.semuaHutang.collectAsStateWithLifecycle()
+                                val hutangBelumLunas = semuaHutang.filter { !it.isLunas }
+                                
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color.Black.copy(alpha = 0.15f))
+                                        .clickable { navController.navigate(Routes.HUTANG_PIUTANG) }
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Outlined.Payments, null, tint = Color(0xFFFCD34D), modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = if(hutangBelumLunas.isEmpty()) stringResource(R.string.debt_status_all_settled) 
+                                                   else stringResource(R.string.debt_status_active, hutangBelumLunas.size),
+                                            color = Color.White.copy(alpha = 0.85f),
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Icon(Icons.Outlined.ChevronRight, null, tint = Color.White.copy(alpha = 0.3f), modifier = Modifier.size(14.dp))
+                                    }
                                 }
-                                Icon(Icons.Outlined.ChevronRight, null, tint = Color.White.copy(alpha = 0.3f), modifier = Modifier.size(16.dp))
                             }
                         }
                     }

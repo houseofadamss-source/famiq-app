@@ -42,7 +42,6 @@ fun HutangPiutangScreen(
     navController: NavController,
     viewModel: TransaksiViewModel = viewModel()
 ) {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val semuaHutang by viewModel.semuaHutang.collectAsStateWithLifecycle()
     val isFamilyMode by viewModel.isFamilyMode.collectAsStateWithLifecycle()
@@ -53,6 +52,9 @@ fun HutangPiutangScreen(
     val onBg = MaterialTheme.colorScheme.onBackground
 
     var showAddSheet by remember { mutableStateOf(false) }
+    var selectedHutangForEdit by remember { mutableStateOf<HutangPiutang?>(null) }
+    var showDeleteConfirmByData by remember { mutableStateOf<HutangPiutang?>(null) }
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Scaffold(
@@ -123,6 +125,7 @@ fun HutangPiutangScreen(
                         items(semuaHutang) { data ->
                             HutangItemCard(
                                 data = data, 
+                                onClick = { selectedHutangForEdit = data },
                                 onPayCicilan = { 
                                     val updated = it.copy(
                                         tenorTerbayar = it.tenorTerbayar + 1,
@@ -131,7 +134,6 @@ fun HutangPiutangScreen(
                                     )
                                     viewModel.updateHutangRouter(updated)
                                     
-                                    // ✅ OTOMATIS CATAT KE TRANSAKSI
                                     coroutineScope.launch {
                                         viewModel.tambahTransaksiRouter(
                                             nominal = it.nominalPerBulan,
@@ -145,7 +147,7 @@ fun HutangPiutangScreen(
                                     }
                                 },
                                 onMarkLunas = { viewModel.updateHutangRouter(it.copy(nominalTerbayar = it.nominalTotal, isLunas = true, tenorTerbayar = it.tenorTotal)) }, 
-                                onDelete = { viewModel.hapusHutangRouter(it) }
+                                onDelete = { showDeleteConfirmByData = it }
                             )
                         }
                     }
@@ -170,11 +172,51 @@ fun HutangPiutangScreen(
             )
         }
     }
+
+    if (selectedHutangForEdit != null) {
+        ModalBottomSheet(
+            onDismissRequest = { selectedHutangForEdit = null },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = surfaceColor
+        ) {
+            AddHutangContent(
+                viewModel = viewModel,
+                existingData = selectedHutangForEdit,
+                onSave = { 
+                    viewModel.updateHutangRouter(it)
+                    selectedHutangForEdit = null
+                },
+                onCancel = { selectedHutangForEdit = null }
+            )
+        }
+    }
+
+    if (showDeleteConfirmByData != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmByData = null },
+            title = { Text("Hapus Data?", fontWeight = FontWeight.Bold) },
+            text = { Text("Yakin ingin menghapus catatan ini? Data yang sudah dihapus tidak bisa dikembalikan.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.hapusHutangRouter(showDeleteConfirmByData!!)
+                        showDeleteConfirmByData = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626))
+                ) { Text("Hapus Permanen") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmByData = null }) { Text("Batal") }
+            },
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
 }
 
 @Composable
 fun HutangItemCard(
     data: HutangPiutang, 
+    onClick: () -> Unit,
     onPayCicilan: (HutangPiutang) -> Unit,
     onMarkLunas: (HutangPiutang) -> Unit, 
     onDelete: (HutangPiutang) -> Unit
@@ -186,6 +228,9 @@ fun HutangItemCard(
     val isHutang = data.tipe == DebtType.HUTANG
 
     Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = surfaceColor),
         elevation = CardDefaults.cardElevation(2.dp)
@@ -276,20 +321,22 @@ fun HutangItemCard(
 @Composable
 fun AddHutangContent(
     viewModel: TransaksiViewModel,
+    existingData: HutangPiutang? = null,
     onSave: (HutangPiutang) -> Unit, 
     onCancel: () -> Unit
 ) {
     val context = LocalContext.current
     val namaSaya by viewModel.namaSaya.collectAsStateWithLifecycle()
     
-    var nama by remember { mutableStateOf("") }
-    var nominal by remember { mutableStateOf("") }
-    var tipe by remember { mutableStateOf(DebtType.HUTANG) }
-    var isCicilan by remember { mutableStateOf(false) }
-    var tenor by remember { mutableStateOf("12") }
-    var tenorTerbayar by remember { mutableStateOf("0") }
-    var tanggalTagihan by remember { mutableStateOf("5") }
-    var catatan by remember { mutableStateOf("") }
+    var nama by remember { mutableStateOf(existingData?.kontak ?: "") }
+    var nominal by remember { mutableStateOf(existingData?.nominalTotal?.toString() ?: "") }
+    var tipe by remember { mutableStateOf(existingData?.tipe ?: DebtType.HUTANG) }
+    var isCicilan by remember { mutableStateOf(existingData?.isCicilan ?: false) }
+    var nominalCicilanManual by remember { mutableStateOf(existingData?.nominalPerBulan?.toString() ?: "") }
+    var tenor by remember { mutableStateOf(existingData?.tenorTotal?.toString() ?: "12") }
+    var tenorTerbayar by remember { mutableStateOf(existingData?.tenorTerbayar?.toString() ?: "0") }
+    var tanggalTagihan by remember { mutableStateOf(existingData?.tanggalTagihan?.toString() ?: "5") }
+    var catatan by remember { mutableStateOf(existingData?.catatan ?: "") }
     var isSaving by remember { mutableStateOf(false) }
     
     Column(modifier = Modifier.fillMaxWidth().padding(24.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -350,9 +397,30 @@ fun AddHutangContent(
             }
             val nomVal = nominal.toLongOrNull() ?: 0L
             val tenorVal = tenor.toIntOrNull() ?: 1
+            
+            // Auto-Suggest Logic
+            LaunchedEffect(nominal, tenor) {
+                if (nomVal > 0 && tenorVal > 0 && nominalCicilanManual.isEmpty()) {
+                    nominalCicilanManual = (nomVal / tenorVal).toString()
+                }
+            }
+
+            OutlinedTextField(
+                value = nominalCicilanManual,
+                onValueChange = { if(it.all { c -> c.isDigit() }) nominalCicilanManual = it },
+                label = { Text("Cicilan per Bulan") },
+                modifier = Modifier.fillMaxWidth(),
+                prefix = { Text("Rp ") },
+                placeholder = { Text("Input manual jika ada selisih") },
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                visualTransformation = RupiahVisualTransformation()
+            )
+
             if (nomVal > 0 && tenorVal > 0) {
-                val perBulan = nomVal / tenorVal
-                Text("Estimasi: Rp ${formatRupiah(perBulan)} / bulan", fontSize = 12.sp, color = GreenMain, fontWeight = FontWeight.Bold)
+                val pembagianMurni = nomVal / tenorVal
+                if (nominalCicilanManual.toLongOrNull() != pembagianMurni) {
+                    Text("Catatan: Angka manual digunakan untuk akurasi tagihan asli.", fontSize = 11.sp, color = Color.Gray, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                }
             }
         }
         
@@ -372,20 +440,22 @@ fun AddHutangContent(
                         set(Calendar.DAY_OF_MONTH, tglTagihan)
                     }
                     
-                    val perBulan = if(isCicilan) nom / tenorVal else 0L
+                    val perBulan = if(isCicilan) (nominalCicilanManual.toLongOrNull() ?: (nom / tenorVal)) else 0L
                     val newData = HutangPiutang(
+                        id = existingData?.id ?: UUID.randomUUID().toString(),
                         kontak = nama, 
                         nominalTotal = nom, 
                         tipe = tipe, 
                         jatuhTempo = cal.timeInMillis, 
                         catatan = catatan, 
-                        diinputOleh = namaSaya,
+                        diinputOleh = existingData?.diinputOleh ?: namaSaya,
                         isCicilan = isCicilan,
                         tenorTotal = tenorVal,
                         tenorTerbayar = sdhBayar,
                         nominalPerBulan = perBulan,
-                        nominalTerbayar = if(isCicilan) perBulan * sdhBayar else 0L,
-                        tanggalTagihan = tglTagihan
+                        nominalTerbayar = if(isCicilan) perBulan * sdhBayar else existingData?.nominalTerbayar ?: 0L,
+                        tanggalTagihan = tglTagihan,
+                        isLunas = if(isCicilan) sdhBayar >= tenorVal else existingData?.isLunas ?: false
                     )
                     onSave(newData)
                 } else {

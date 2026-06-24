@@ -388,4 +388,7 @@
     <string name="version_caption_prefix">Version %1$s</string>
     <string name="daily_expense">Daily Expense</string>
     <string name="debt_payment">Debt Payment</string>
+    <string name="up_to_today">up to today</string>
+    <string name="debt_status_active">%1$d active bills</string>
+    <string name="debt_status_all_settled">All settled ✨</string>
 </resources>

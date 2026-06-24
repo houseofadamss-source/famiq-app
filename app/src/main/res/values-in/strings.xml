@@ -388,4 +388,7 @@
     <string name="version_caption_prefix">Versi %1$s</string>
     <string name="daily_expense">Harian</string>
     <string name="debt_payment">Cicilan</string>
+    <string name="up_to_today">s/d hari ini</string>
+    <string name="debt_status_active">%1$d tagihan perlu dipantau</string>
+    <string name="debt_status_all_settled">Semua tagihan lunas ✨</string>
 </resources>
